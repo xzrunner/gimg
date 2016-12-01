@@ -6,6 +6,13 @@ extern "C"
 #ifndef gameimage_typedef_h
 #define gameimage_typedef_h
 
+enum GIMG_FILE {
+	FILE_INVALID = 0,
+	FILE_PNG,
+	FILE_JPG,
+	FILE_BMP,
+};
+
 enum GIMG_IMAGE_TYPE {
 	GIT_INVALID = 0,
 	GIT_PNG,

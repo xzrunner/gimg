@@ -1,41 +1,38 @@
 #include "gimg_import.h"
-
+#include "gimg_utility.h"
 #include "gimg_png.h"
 #include "gimg_jpg.h"
+#include "gimg_bmp.h"
 
 #include <stdbool.h>
-#include <string.h>
-#include <ctype.h>		// tolower
-
-static inline bool
-_is_png(const char* filepath) {
-	int n = strlen(filepath);
-	return tolower(filepath[n-4]) == '.'
-		&& tolower(filepath[n-3]) == 'p'
-		&& tolower(filepath[n-2]) == 'n'
-		&& tolower(filepath[n-1]) == 'g';
-}
-
-static inline bool
-_is_jpg(const char* filepath) {
-	int n = strlen(filepath);
-	return tolower(filepath[n-4]) == '.'
-		&& tolower(filepath[n-3]) == 'j'
-		&& tolower(filepath[n-2]) == 'p'
-		&& tolower(filepath[n-1]) == 'g';
-}
 
 uint8_t* 
 gimg_import(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMAT* format) {
 	uint8_t* pixels = NULL;
-	if (_is_png(filepath)) {
-		pixels = gimg_png_read(filepath, width, height, format);
-	} else if (_is_jpg(filepath)) {
-		int channels;
-		pixels = gimg_jpg_read(filepath, width, height, &channels);
-		*format = GPF_RGB;
+	switch (gimg_file_type(filepath)) {
+	case FILE_PNG:
+		{
+			pixels = gimg_png_read(filepath, width, height, format);
+		}
+		break;
+	case FILE_JPG:
+		{
+			int channels;
+			pixels = gimg_jpg_read(filepath, width, height, &channels);
+			*format = GPF_RGB;
+		}
+		break;
+	case FILE_BMP:
+		{
+			pixels = gimg_bmp_read(filepath, width, height);
+			*format = GPF_RGB;
+		}
+		break;
+	default:
+		return pixels;
 	}
 	if (pixels && *format == GPF_RGBA) {
+		gimg_pre_muilti_alpha(pixels, *width, *height);
 		gimg_remove_ghost_pixel(pixels, *width, *height);
 		gimg_format_pixels_alpha(pixels, *width, *height, 0);
 	}
