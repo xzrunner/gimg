@@ -7,7 +7,7 @@ extern "C"
 #define gameimage_typedef_h
 
 enum GIMG_FILE {
-	FILE_INVALID = 0,
+	GIMG_FILE_INVALID = 0,
 	FILE_PNG,
 	FILE_JPG,
 	FILE_BMP,

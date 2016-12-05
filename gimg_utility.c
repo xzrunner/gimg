@@ -22,6 +22,6 @@ gimg_file_type(const char* filepath) {
 			   tolower(filepath[n-1]) == 'p') {
 		return FILE_BMP;
 	} else {
-		return FILE_INVALID;
+		return GIMG_FILE_INVALID;
 	}
 }
