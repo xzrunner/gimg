@@ -5,6 +5,7 @@
 #include "gimg_bmp.h"
 
 #include <stdbool.h>
+#include <math.h>
 
 uint8_t* 
 gimg_import(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMAT* format) {
@@ -95,5 +96,19 @@ gimg_remove_ghost_pixel(uint8_t* pixels, int width, int height) {
 			pixels[ptr++] = b;
 			pixels[ptr++] = a;
 		}
+	}
+}
+
+void 
+gimg_revert_y(uint32_t* pixels, int width, int height) {
+	uint32_t buf[width];
+	int line_sz = width * sizeof(uint32_t);
+	int bpos = 0, epos = width * (height - 1);
+	for (int i = 0, n = floor(height / 2); i < n; ++i) {
+		memcpy(buf, &pixels[bpos], line_sz);
+		memcpy(&pixels[bpos], &pixels[epos], line_sz);
+		memcpy(&pixels[epos], buf, line_sz);
+		bpos += width;
+		epos -= width;
 	}
 }
