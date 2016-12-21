@@ -634,7 +634,7 @@ struct PVRTexHeaderV3 {
 
 typedef unsigned int    PVRTuint32;
 // V3 Header Identifiers.
-const PVRTuint32 PVRTEX3_IDENT      = 0x03525650; // 'P''V''R'3
+static const PVRTuint32 PVRTEX3_IDENT      = 0x03525650; // 'P''V''R'3
 
 uint8_t* 
 gimg_pvr_read_file(const char* filepath, uint32_t* width, uint32_t* height) {
