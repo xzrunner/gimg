@@ -10,12 +10,16 @@
 #include <stdbool.h>
 #include <assert.h>
 
-static int _offset = 0;
+struct stream {
+	char* data;
+	int offset;
+};
+
 static inline void
 _read_memory_cb(png_structp png, png_bytep data, png_size_t size) {
-	char* raw = (char*) png_get_io_ptr(png);
-	memcpy(data, raw + _offset, size);
-	_offset += size;
+	struct stream* ss = (struct stream*)png_get_io_ptr(png);
+	memcpy(data, ss->data + ss->offset, size);
+	ss->offset += size;
 }
 
 uint8_t* 
@@ -32,7 +36,9 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	}
 	fs_close(file);
 
-	_offset = 0;
+	struct stream ss;
+	ss.data = buf;
+	ss.offset = 0;
 
 	png_byte lHeader[8];
 	png_structp lPngPtr = NULL; png_infop lInfoPtr = NULL;
@@ -40,17 +46,17 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	png_int_32 lRowSize; bool lTransparency;
 	do
 	{
-		// 		if (m_resource.read(lHeader, sizeof(lHeader)) == 0)
-		// 			break;
-		memcpy(lHeader, (char*)buf + _offset, sizeof(lHeader));
-		_offset += sizeof(lHeader);
+// 		if (m_resource.read(lHeader, sizeof(lHeader)) == 0)
+// 			break;
+		memcpy(lHeader, (char*)ss.data + ss.offset, sizeof(lHeader));
+		ss.offset += sizeof(lHeader);
 		if (png_sig_cmp(lHeader, 0, 8) != 0) break;
 
 		lPngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!lPngPtr) break;
 		lInfoPtr = png_create_info_struct(lPngPtr);
 		if (!lInfoPtr) break;
-		png_set_read_fn(lPngPtr, buf, _read_memory_cb);
+		png_set_read_fn(lPngPtr, &ss, _read_memory_cb);
 		if (setjmp(png_jmpbuf(lPngPtr))) break;
 
 		png_set_sig_bytes(lPngPtr, 8);
