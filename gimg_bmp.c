@@ -1,10 +1,12 @@
 #include "gimg_bmp.h"
+#include "gimg_typedef.h"
 
 #include <fs_file.h>
 #include <fault.h>
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define BMP_HEADER_SIZE 54
 
@@ -36,8 +38,66 @@ typedef struct tagBITMAPINFOHEADER{
 	DWORD      biClrImportant;
 } BITMAPINFOHEADER, *PBITMAPINFOHEADER;
 
+static uint8_t*
+read_pixels(struct fs_file* file, int w, int h, int c) {
+	assert(c == 4 || c == 3);
+
+	int line_sz;
+	if (c == 3) {
+		int padding = 0; 
+		while ((w * 3 + padding) % 4 != 0) {
+			padding++;
+		}
+		line_sz = w * 3 + padding;
+	} else {
+		line_sz = w * 4;
+	}
+
+	uint8_t* pixels = (uint8_t*)malloc(line_sz * h);
+	if (!pixels) {
+		fault("malloc fail: gimg_bmp_read\n");
+	}
+
+	if (c == 3) {
+		int dst_ptr = 0;
+		uint8_t data[line_sz];
+		for (int y = 0; y < h; ++y) {
+			int src_ptr= 0;
+			fs_read(file, data, line_sz);
+			for (int x = 0; x < w; ++x) {
+				const uint8_t* src = &data[src_ptr];
+				uint8_t* dst = &pixels[dst_ptr];
+				dst[0] = src[2];
+				dst[1] = src[1];
+				dst[2] = src[0];
+				src_ptr += c;
+				dst_ptr += c;
+			}
+		}
+	} else {
+		int dst_ptr = 0;
+		uint8_t data[line_sz];
+		for (int y = 0; y < h; ++y) {
+			int src_ptr= 0;
+			fs_read(file, data, line_sz);
+			for (int x = 0; x < w; ++x) {
+				const uint8_t* src = &data[src_ptr];
+				uint8_t* dst = &pixels[dst_ptr];
+				dst[0] = src[2];
+				dst[1] = src[1];
+				dst[2] = src[0];
+				dst[3] = src[3];
+				src_ptr += c;
+				dst_ptr += c;
+			}
+		}
+	}
+
+	return pixels;
+}
+
 uint8_t* 
-gimg_bmp_read(const char* filepath, int* width, int* height) {
+gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open image file: %s\n", filepath);
@@ -60,34 +120,11 @@ gimg_bmp_read(const char* filepath, int* width, int* height) {
 
 	uint8_t* pixels = NULL;
 	if (bmih.biBitCount == 32) {
-		;
+		pixels = read_pixels(file, w, h, 4);
+		*format = GPF_RGBA;
 	} else if (bmih.biBitCount == 24) {
-		int padding = 0; 
-		while ((w * 3 + padding) % 4 != 0) {
-			padding++;
-		}
-
-		int line_sz = w * 3 + padding;
-		pixels = (uint8_t*)malloc(line_sz * h);
-		if (!pixels) {
-			fault("malloc fail: gimg_bmp_read\n");
-		}
-
-		int dst_ptr = 0;
-		uint8_t data[line_sz];
-		for (int y = 0; y < h; ++y) {
-			int src_ptr= 0;
-			fs_read(file, data, line_sz);
-			for (int x = 0; x < w; ++x) {
-				const uint8_t* src = &data[src_ptr];
-				uint8_t* dst = &pixels[dst_ptr];
-				dst[0] = src[2];
-				dst[1] = src[1];
-				dst[2] = src[0];
-				src_ptr += 3;
-				dst_ptr += 3;
-			}
-		}
+		pixels = read_pixels(file, w, h, 3);
+		*format = GPF_RGB;
 	} else {
 		fault("Invalid image file: %s\n", filepath);
 	}
@@ -99,6 +136,11 @@ gimg_bmp_read(const char* filepath, int* width, int* height) {
 
 int 
 gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int height) {
+	struct fs_file* file = fs_open(filepath, "wb");
+	if (file == NULL) {
+		fault("Can't open image file: %s\n", filepath);
+	}
+
 	BITMAPFILEHEADER bmfh;
 	memset(&bmfh, 0, sizeof(bmfh));
 	bmfh.bfType = 0x4d42;       // 0x4d42 = 'BM'
@@ -121,7 +163,6 @@ gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	bmih.biClrUsed = 0;
 	bmih.biClrImportant = 0;
 
-	struct fs_file* file = fs_open(filepath, "wb");
 	fs_write(file, &bmfh, sizeof(bmfh));
 	fs_write(file, &bmih, sizeof(bmih));
 
