@@ -640,7 +640,6 @@ uint8_t*
 gimg_pvr_read_file(const char* filepath, uint32_t* width, uint32_t* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		assert(0);
 		fault("Can't open pvr file: %s\n", filepath);
 	}
 
@@ -679,7 +678,6 @@ void
 gimg_pvr_write_file(const char* filepath, const uint8_t* buf, uint32_t width, uint32_t height) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {
-		assert(0);
 		fault("Can't open pvr file: %s\n", filepath);
 	}
 

@@ -114,7 +114,6 @@ uint8_t*
 gimg_etc2_read_file(const char* filepath, uint32_t* width, uint32_t* height, int* type) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		assert(0);
 		fault("Can't open etc2 file: %s\n", filepath);
 	}
 	
