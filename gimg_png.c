@@ -1,4 +1,5 @@
 #include "gimg_png.h"
+#include "gimg_typedef.h"
 
 #include <fs_file.h>
 #include <fault.h>
@@ -18,16 +19,16 @@ _read_memory_cb(png_structp png, png_bytep data, png_size_t size) {
 }
 
 uint8_t* 
-gimg_png_read(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMAT* format) {
+gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-//		fault("Can't open png file: %s\n", filepath);
+		fault("Can't open png file: %s\n", filepath);
 	}
 	
 	size_t sz = fs_size(file);
 	uint8_t* buf = (uint8_t*)malloc(sz);
 	if (fs_read(file, buf, sz) != sz) {
-//		fault("Invalid uncompress data source\n");
+		fault("Invalid uncompress data source\n");
 	}
 	fs_close(file);
 
@@ -138,11 +139,20 @@ gimg_png_read(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FOR
 }
 
 int 
-gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height) {
-	unsigned bands_per_pixel = 4;
+gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
+	if (format != 3 && format != 4) {
+		return -1;
+	}
 
-	png_byte color_type = 0;
-	color_type = PNG_COLOR_TYPE_RGBA;
+	unsigned bands_per_pixel;
+	png_byte color_type;
+	if (format == 3) {
+		bands_per_pixel = 3;
+		color_type = PNG_COLOR_TYPE_RGB;
+	} else {
+		bands_per_pixel = 4;
+		color_type = PNG_COLOR_TYPE_RGBA;
+	}
 
 	int bit_depth = 8;
 
@@ -162,9 +172,14 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	png_write_info(png_ptr, info_ptr);
 
 	uint8_t* row_pointers[height];
-	for (int y = 0; y < height; y++) {
-		// reverse
-		row_pointers[height - 1 - y] = (uint8_t*)pixels + y * (width * bands_per_pixel * bit_depth / 8);
+	if (reverse) {
+		for (int y = 0; y < height; y++) {
+			row_pointers[height - 1 - y] = (uint8_t*)pixels + y * (width * bands_per_pixel * bit_depth / 8);
+		}
+	} else {
+		for (int y = 0; y < height; y++) {
+			row_pointers[y] = (uint8_t*)pixels + y * (width * bands_per_pixel * bit_depth / 8);
+		}
 	}
 
 	png_write_image(png_ptr, &row_pointers[0]);
