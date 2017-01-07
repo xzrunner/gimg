@@ -6,11 +6,9 @@ extern "C"
 #ifndef gameimage_export_h
 #define gameimage_export_h
 
-#include "gimg_typedef.h"
-
 #include <stdint.h>
 
-void gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, enum GIMG_PIXEL_FORMAT fmt);
+int gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, int format, int reverse);
 
 #endif // gameimage_export_h
 

@@ -19,8 +19,20 @@ gimg_file_type(const char* filepath) {
 		return FILE_JPG;
 	} else if (tolower(filepath[n-3]) == 'b' && 
 		       tolower(filepath[n-2]) == 'm' && 
-			   tolower(filepath[n-1]) == 'p') {
+		       tolower(filepath[n-1]) == 'p') {
 		return FILE_BMP;
+	} else if (tolower(filepath[n-3]) == 'p' && 
+		       tolower(filepath[n-2]) == 'p' && 
+		       tolower(filepath[n-1]) == 'm') {
+		return FILE_PPM;
+	} else if (tolower(filepath[n-3]) == 'p' && 
+		       tolower(filepath[n-2]) == 'v' && 
+		       tolower(filepath[n-1]) == 'r') {
+		return FILE_PVR;
+	} else if (tolower(filepath[n-3]) == 'p' && 
+		       tolower(filepath[n-2]) == 'k' && 
+		       tolower(filepath[n-1]) == 'm') {
+		return FILE_PKM;
 	} else {
 		return GIMG_FILE_INVALID;
 	}

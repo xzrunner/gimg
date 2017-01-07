@@ -1,16 +1,23 @@
 #include "gimg_import.h"
 #include "gimg_utility.h"
+#include "gimg_typedef.h"
+
 #include "gimg_png.h"
 #include "gimg_jpg.h"
 #include "gimg_bmp.h"
+#include "gimg_ppm.h"
+#include "gimg_pvr.h"
+#include "gimg_etc2.h"
 
 #include <stdbool.h>
 #include <math.h>
+#include <stdlib.h>
 
 uint8_t* 
-gimg_import(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMAT* format) {
+gimg_import(const char* filepath, int* width, int* height, int* format) {
 	uint8_t* pixels = NULL;
-	switch (gimg_file_type(filepath)) {
+	int type = gimg_file_type(filepath);
+	switch (type) {
 	case FILE_PNG:
 		{
 			pixels = gimg_png_read(filepath, width, height, format);
@@ -25,8 +32,32 @@ gimg_import(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMA
 		break;
 	case FILE_BMP:
 		{
-			pixels = gimg_bmp_read(filepath, width, height);
+			pixels = gimg_bmp_read(filepath, width, height, format);
+		}
+		break;
+	case FILE_PPM:
+		{
+			pixels = gimg_ppm_read(filepath, width, height);
 			*format = GPF_RGB;
+		}
+		break;
+	case FILE_PVR:
+		{
+			uint8_t* compressed = gimg_pvr_read_file(filepath, width, height);
+			uint8_t* uncompressed = gimg_pvr_decode(compressed, *width, *height);
+			free(compressed);
+			pixels = uncompressed;
+			*format = GPF_RGBA;
+		}
+		break;
+	case FILE_PKM:
+		{
+			int type;
+			uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
+			uint8_t* uncompressed = gimg_etc2_decode(compressed, *width, *height, type);
+			free(compressed);
+			pixels = uncompressed;
+			*format = GPF_RGBA;
 		}
 		break;
 	default:
@@ -38,6 +69,18 @@ gimg_import(const char* filepath, int* width, int* height, enum GIMG_PIXEL_FORMA
 		gimg_format_pixels_alpha(pixels, *width, *height, 0);
 	}
 	return pixels;
+}
+
+int 
+gimg_read_header(const char* filepath, int* width, int* height) {
+	int ret = -1;
+	int type = gimg_file_type(filepath);
+	switch (type) {
+	case FILE_PNG:
+		gimg_png_read_header(filepath, width, height);
+		break;
+	}
+	return ret;
 }
 
 void 
