@@ -143,15 +143,42 @@ gimg_remove_ghost_pixel(uint8_t* pixels, int width, int height) {
 }
 
 void 
-gimg_revert_y(uint32_t* pixels, int width, int height) {
-	uint32_t buf[width];
-	int line_sz = width * sizeof(uint32_t);
-	int bpos = 0, epos = width * (height - 1);
-	for (int i = 0, n = floor(height / 2); i < n; ++i) {
-		memcpy(buf, &pixels[bpos], line_sz);
-		memcpy(&pixels[bpos], &pixels[epos], line_sz);
-		memcpy(&pixels[epos], buf, line_sz);
-		bpos += width;
-		epos -= width;
+gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
+	int channel = 0;
+	switch (format)
+	{
+	case GPF_ALPHA: case GPF_LUMINANCE: case GPF_LUMINANCE_ALPHA:
+		channel = 1;
+		break;
+	case GPF_RGB:
+		channel = 3;
+		break;
+	case GPF_RGBA:
+		channel = 4;
+		break;
 	}
+
+	int line_sz = width * channel;
+	uint8_t buf[line_sz];
+	int bpos = 0, epos = line_sz * (height - 1);
+ 	for (int i = 0, n = floor(height / 2); i < n; ++i) {
+ 		memcpy(buf, &pixels[bpos], line_sz);
+ 		memcpy(&pixels[bpos], &pixels[epos], line_sz);
+ 		memcpy(&pixels[epos], buf, line_sz);
+ 		bpos += line_sz;
+ 		epos -= line_sz;
+ 	}
+}
+
+uint8_t* 
+gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
+	uint8_t* rgb = (uint8_t*)malloc(width*height*3);
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j) {
+			int src = (i*width+j)*4;
+			int dst = (i*width+j)*3;
+			memcpy(&rgb[dst], &pixels[src], 3);
+		}
+	}
+	return rgb;
 }
