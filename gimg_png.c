@@ -16,7 +16,8 @@ struct stream {
 };
 
 static inline void
-_read_memory_cb(png_structp png, png_bytep data, png_size_t size) {
+_read_memory_cb(png_structp png, png_bytep data, png_size_t size) 
+{
 	struct stream* ss = (struct stream*)png_get_io_ptr(png);
 	memcpy(data, ss->data + ss->offset, size);
 	ss->offset += size;
@@ -73,7 +74,6 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		{
 			png_set_tRNS_to_alpha(lPngPtr);
 			lTransparency = true;
-			break;
 		}
 		// Expands PNG with less than 8bits per channel to 8bits.
 		if (lDepth < 8) 
@@ -195,7 +195,63 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	return 0;
 }
 
+static void 
+_read_file_cb(png_structp png_ptr, png_bytep out, png_size_t count)
+{
+	png_voidp io_ptr = png_get_io_ptr(png_ptr);
+	if (io_ptr == 0) {
+		return;
+	}
+
+	struct fs_file* file = (struct fs_file*)io_ptr;
+	fs_read(file, (char*)out, count);
+}
+
 void 
 gimg_png_read_header(const char* filepath, int* width, int* height) {
-	// todo
+	struct fs_file* file = fs_open(filepath, "rb");
+	if (file == NULL) {
+		fault("Can't open png file: %s\n", filepath);
+	}
+
+	png_byte header[8];
+	fs_read(file, header, sizeof(header));
+	if (png_sig_cmp(header, 0, 8) != 0) {
+		fs_close(file);
+		return;
+	}
+
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if (!png_ptr) {
+		fs_close(file);
+		return;
+	}
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr) {
+		fs_close(file);
+		return;
+	}
+	png_set_read_fn(png_ptr, (void*)file, _read_file_cb);
+	if (setjmp(png_jmpbuf(png_ptr))) {
+		fs_close(file);
+		return;
+	}
+
+	png_set_sig_bytes(png_ptr, 8);
+
+	png_read_info(png_ptr, info_ptr);
+
+	png_int_32 _depth, _color_type;
+	png_uint_32 _width, _height;
+	png_get_IHDR(png_ptr, info_ptr, &_width, &_height, &_depth, &_color_type, NULL, NULL, NULL);
+
+	*width = _width; *height = _height;
+
+	if (png_ptr != NULL) 
+	{
+		png_infop* info_ptr_ptr = info_ptr != NULL ? &info_ptr : NULL;
+		png_destroy_read_struct(&png_ptr, info_ptr_ptr, NULL);
+	}
+
+	fs_close(file);
 }
