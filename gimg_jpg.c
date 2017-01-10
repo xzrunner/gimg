@@ -122,7 +122,8 @@ gimg_jpg_read(const char* filepath, int* width, int* height, int* channels) {
    /* Here we use the library's state variable cinfo.output_scanline as the
     * loop counter, so that we don't have to keep track ourselves.
     */
-   long counter = 0;
+//   long counter = 0;
+   long counter = row_stride * (cinfo.output_height - 1);
    while (cinfo.output_scanline < cinfo.output_height) {
      /* jpeg_read_scanlines expects an array of pointers to scanlines.
       * Here the array is only one element long, but you could ask for
@@ -132,7 +133,8 @@ gimg_jpg_read(const char* filepath, int* width, int* height, int* channels) {
      /* Assume put_scanline_someplace wants a pointer and sample count. */
 //     put_scanline_someplace(buffer[0], row_stride);
 	 memcpy(pixels + counter, buffer[0], row_stride);
-	 counter += row_stride;
+//	 counter += row_stride;
+	 counter -= row_stride;
    }
  
    /* Step 7: Finish decompression */
