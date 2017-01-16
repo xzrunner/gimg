@@ -146,13 +146,13 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 
 int 
 gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
-	if (format != 3 && format != 4) {
+	if (format != GPF_RGB && format != GPF_RGBA) {
 		return -1;
 	}
 
 	unsigned bands_per_pixel;
 	png_byte color_type;
-	if (format == 3) {
+	if (format == GPF_RGB) {
 		bands_per_pixel = 3;
 		color_type = PNG_COLOR_TYPE_RGB;
 	} else {
