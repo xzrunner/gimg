@@ -63,8 +63,8 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	default:
 		return pixels;
 	}
-	if (pixels && *format == GPF_RGBA) {
-		gimg_pre_muilti_alpha(pixels, *width, *height);
+	if (pixels && *format == GPF_RGBA) 
+	{
 		gimg_remove_ghost_pixel(pixels, *width, *height);
 		gimg_format_pixels_alpha(pixels, *width, *height, 0);
 	}
@@ -104,7 +104,7 @@ gimg_format_pixels_alpha(uint8_t* pixels, int width, int height, int val) {
 }
 
 void 
-gimg_pre_muilti_alpha(uint8_t* pixels, int width, int height) {
+gimg_pre_mul_alpha(uint8_t* pixels, int width, int height) {
 	int pos = 0;
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
