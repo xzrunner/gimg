@@ -14,7 +14,11 @@ typedef int LONG;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
 
-#include <pshpack2.h>
+#ifdef _WIN32
+	#include <pshpack2.h>
+#else
+	#pragma pack(2)
+#endif // _WIN32
 typedef struct tagBITMAPFILEHEADER {
 	WORD    bfType;
 	DWORD   bfSize;
@@ -22,7 +26,11 @@ typedef struct tagBITMAPFILEHEADER {
 	WORD    bfReserved2;
 	DWORD   bfOffBits;
 } BITMAPFILEHEADER, *PBITMAPFILEHEADER;
-#include <poppack.h>
+#ifdef _WIN32
+	#include <poppack.h>
+#else
+	#pragma pack()
+#endif // _WIN32
 
 typedef struct tagBITMAPINFOHEADER{
 	DWORD      biSize;
