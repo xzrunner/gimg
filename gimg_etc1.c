@@ -74,7 +74,7 @@ struct PKMHeader {
 };
 
 uint8_t* 
-gimg_etc1_read_file(const char* filepath, uint32_t* width, uint32_t* height) {
+gimg_etc1_read_file(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open etc1 file: %s\n", filepath);

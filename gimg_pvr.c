@@ -637,7 +637,7 @@ typedef unsigned int    PVRTuint32;
 static const PVRTuint32 PVRTEX3_IDENT      = 0x03525650; // 'P''V''R'3
 
 uint8_t* 
-gimg_pvr_read_file(const char* filepath, uint32_t* width, uint32_t* height) {
+gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open pvr file: %s\n", filepath);
@@ -675,7 +675,7 @@ gimg_pvr_read_file(const char* filepath, uint32_t* width, uint32_t* height) {
 }
 
 void 
-gimg_pvr_write_file(const char* filepath, const uint8_t* buf, uint32_t width, uint32_t height) {
+gimg_pvr_write_file(const char* filepath, const uint8_t* buf, int width, int height) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {
 		fault("Can't open pvr file: %s\n", filepath);

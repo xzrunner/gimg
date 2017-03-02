@@ -24,7 +24,7 @@ enum DTEX_ETC_TYPE
 uint8_t* gimg_etc2_decode(const uint8_t* buf, int width, int height, int type);
 uint8_t* gimg_etc2_encode(const uint8_t* buf, int width, int height);
 
-uint8_t* gimg_etc2_read_file(const char* filepath, uint32_t* width, uint32_t* height, int* type);
+uint8_t* gimg_etc2_read_file(const char* filepath, int* width, int* height, int* type);
 
 uint8_t* gimg_etc2_init_blank(int edge);
 

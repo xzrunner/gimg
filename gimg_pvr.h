@@ -12,8 +12,8 @@ extern "C"
 uint8_t* gimg_pvr_decode(const uint8_t* buf, int width, int height);
 uint8_t* gimg_pvr_encode(const uint8_t* buf, int width, int height);
 
-uint8_t* gimg_pvr_read_file(const char* filepath, uint32_t* width, uint32_t* height);
-void gimg_pvr_write_file(const char* filepath, const uint8_t* buf, uint32_t width, uint32_t height);
+uint8_t* gimg_pvr_read_file(const char* filepath, int* width, int* height);
+void gimg_pvr_write_file(const char* filepath, const uint8_t* buf, int width, int height);
 
 unsigned gimg_pvr_get_morton_number(int x, int y);
 

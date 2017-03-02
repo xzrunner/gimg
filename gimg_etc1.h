@@ -11,7 +11,7 @@ extern "C"
 uint8_t* gimg_etc1_decode(const uint8_t* buf, int width, int height);
 uint8_t* gimg_etc1_encode(const uint8_t* buf, int width, int height);
 
-uint8_t* gimg_etc1_read_file(const char* filepath, uint32_t* width, uint32_t* height);
+uint8_t* gimg_etc1_read_file(const char* filepath, int* width, int* height);
 
 #endif // gameimage_etc1_h
 

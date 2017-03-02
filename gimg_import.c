@@ -9,9 +9,10 @@
 #include "gimg_pvr.h"
 #include "gimg_etc2.h"
 
-#include <stdbool.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 uint8_t* 
 gimg_import(const char* filepath, int* width, int* height, int* format) {
