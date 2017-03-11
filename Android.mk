@@ -17,6 +17,15 @@ LOCAL_C_INCLUDES  := \
 	${LUA_SRC_PATH} \
 	${FS_SRC_PATH} \
 	${LOGGER_SRC_PATH} \
+	${RG_ETC1_SRC_PATH} \
+	${ETCPACK_SRC_PATH} \
+	${CLIB_PATH} \
+
+LOCAL_STATIC_LIBRARIES := \
+	libpng \
+	libjpeg \
+	etcpack \
+
 
 LOCAL_SRC_FILES := \
 	$(subst $(LOCAL_PATH)/,,$(shell find $(LOCAL_PATH) -name "*.c" -print)) \
