@@ -39,7 +39,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	fs_close(file);
 
 	struct stream ss;
-	ss.data = buf;
+	ss.data = (char*)buf;
 	ss.offset = 0;
 
 	png_byte lHeader[8];
