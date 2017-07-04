@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 static inline void 
 read_color_block_etc(uint8_t** stream, unsigned int* block1, unsigned int* block2) {
@@ -24,9 +25,14 @@ read_color_block_etc(uint8_t** stream, unsigned int* block1, unsigned int* block
 	*stream = data + 8;
 }
 
+static bool INITED = false;
+
 uint8_t* 
 gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
-	etcpack_init();
+	if (!INITED) {
+		etcpack_init();
+		INITED;
+	}
 
 	assert(IS_POT(width) && IS_POT(height));
 
