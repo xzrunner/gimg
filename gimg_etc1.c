@@ -2,6 +2,7 @@
 #include "gimg_math.h"
 
 #include <fault.h>
+#include <logger.h>
 #include <fs_file.h>
 #include <rg_etc1_for_c.h>
 
@@ -15,7 +16,8 @@ gimg_etc1_decode(const uint8_t* buf, int width, int height) {
 
 	uint8_t* dst = (uint8_t*)malloc(width * height * 4);
 	if (dst == NULL) {
-		fault("Fail to malloc (gimg_etc1_decode)");
+		LOGW("OOM: img_etc1_decode, w %d, h %d", width, height);
+		return NULL;
 	}
 	memset(dst, 0x00, width * height * 4);
 	const uint8_t* ptr_src = buf;
@@ -47,6 +49,10 @@ gimg_etc1_encode(const uint8_t* buf, int width, int height) {
 
 	size_t sz = bw * bh * 8;
 	uint8_t* dst = (uint8_t*)malloc(sz);
+	if (dst == NULL) {
+		LOGW("OOM: gimg_etc1_encode, w %d, h %d", width, height);
+		return NULL;
+	}
 
 	for (int y = 0; y < bh; ++y) {
 		for (int x = 0; x < bw; ++x) {
@@ -88,7 +94,8 @@ gimg_etc1_read_file(const char* filepath, int* width, int* height) {
 	size_t sz = *width * *height / 2;
 	uint8_t* buf = (uint8_t*)malloc(sz);
 	if (buf == NULL) {
-		fault("Fail to malloc (gimg_etc1_read_file)");
+		LOGW("OOM: gimg_etc1_read_file, w %d, h %d", *width, *height);
+		return NULL;
 	}
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");

@@ -2,6 +2,7 @@
 
 #include <fs_file.h>
 #include <fault.h>
+#include <logger.h>
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -74,6 +75,10 @@ gimg_ppm_read(const char* filepath, int* width, int* height) {
 
 	int size = w * h * 3;
 	uint8_t* pixels = (uint8_t*)malloc(size);
+	if (pixels == NULL) {
+		LOGW("OOM: gimg_ppm_read, filepath %s, w %d, h %d", filepath, *width, *height);
+		return NULL;
+	}
 	fs_read(file, pixels, size);
 
 	fs_close(file);

@@ -3,6 +3,7 @@
 
 #include <fs_file.h>
 #include <fault.h>
+#include <logger.h>
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -423,7 +424,8 @@ gimg_pvr_decode(const uint8_t* buf, int width, int height) {
 
 	uint8_t* dst = (uint8_t*)malloc(width * height * 4);
 	if (dst == NULL) {
-		fault("Fail to malloc (gimg_pvr_decode)");
+		LOGW("OOM: gimg_pvr_decode, w %d, h %d", width, height);
+		return NULL;
 	}
 	memset(dst, 0x00, width * height * 4);
 
@@ -518,7 +520,8 @@ gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 	size_t sz = width * height / 2;
 	uint8_t* dst = (uint8_t*)malloc(sz);
 	if (dst == NULL) {
-		fault("Fail to malloc (gimg_pvr_decode)");
+		LOGW("OOM: gimg_pvr_encode, w %d, h %d", width, height);
+		return NULL;
 	}
 	memset(dst, 0x00, sz);	
 
@@ -664,7 +667,8 @@ gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	size_t sz = *width * *height / 2;
 	uint8_t* buf = (uint8_t*)malloc(sz);
 	if (buf == NULL) {
-		fault("Fail to malloc (gimg_pvr_read_file)");
+		LOGW("OOM: gimg_pvr_read_file, filepath %s, w %d, h %d", filepath, *width, *height);
+		return NULL;
 	}
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
@@ -713,6 +717,10 @@ gimg_pvr_init_blank(int edge) {
 
 	size_t sz = edge * edge / 2;
 	uint8_t* buf = (uint8_t*)malloc(sz);
+	if (buf == NULL) {
+		LOGW("OOM: gimg_pvr_init_blank, edge %d", edge);
+		return NULL;
+	}
 
 	int block = edge >> 2;
 	int block_sz = block * block;

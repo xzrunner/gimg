@@ -9,6 +9,8 @@
 #include "gimg_pvr.h"
 #include "gimg_etc2.h"
 
+#include <logger.h>
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -174,6 +176,10 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 uint8_t* 
 gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
 	uint8_t* rgb = (uint8_t*)malloc(width*height*3);
+	if (rgb == NULL) {
+		LOGW("OOM: gimg_rgba2rgb, w %d, h %d", width, height);
+		return NULL;
+	}
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
 			int src = (i*width+j)*4;

@@ -3,6 +3,7 @@
 
 #include <fs_file.h>
 #include <fault.h>
+#include <logger.h>
 
 #include <libpng/png.h>
 
@@ -33,6 +34,10 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	
 	size_t sz = fs_size(file);
 	uint8_t* buf = (uint8_t*)malloc(sz);
+	if (buf == NULL) {
+		LOGW("OOM: gimg_png_read, w %d, h %d", *width, *height);
+		return NULL;
+	}
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
 	}

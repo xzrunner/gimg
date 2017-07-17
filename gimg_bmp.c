@@ -3,6 +3,7 @@
 
 #include <fs_file.h>
 #include <fault.h>
+#include <logger.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -62,8 +63,9 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 	}
 
 	uint8_t* pixels = (uint8_t*)malloc(line_sz * h);
-	if (!pixels) {
-		fault("malloc fail: gimg_bmp_read\n");
+	if (pixels == NULL) {
+		LOGW("OOM: read_pixels, w %d, h %d", w, h);
+		return NULL;
 	}
 
 	if (c == 3) {

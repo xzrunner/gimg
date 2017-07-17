@@ -3,6 +3,7 @@
 
 #include <c_wrap_etcpack.h>
 
+#include <logger.h>
 #include <fault.h>
 #include <fs_file.h>
 
@@ -39,7 +40,8 @@ gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 	int bpp = 4;
 	uint8_t* dst = (uint8_t*)malloc(width * height * bpp);
 	if (dst == NULL) {
-		fault("Fail to malloc (gimg_etc2_decode)");
+		LOGW("OOM: gimg_etc2_decode, w %d, h %d", width, height);
+		return NULL;
 	}
 	memset(dst, 0x00, width * height * bpp);
 
@@ -137,7 +139,8 @@ gimg_etc2_read_file(const char* filepath, int* width, int* height, int* type) {
 	}
 	uint8_t* buf = (uint8_t*)malloc(sz);
 	if (buf == NULL) {
-		fault("Fail to malloc (gimg_etc2_read_file)");
+		LOGW("OOM: gimg_etc2_read_file, w %d, h %d", *width, *height);
+		return NULL;
 	}
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
@@ -153,6 +156,11 @@ gimg_etc2_init_blank(int edge) {
 
 	size_t sz = edge * edge;
 	uint8_t* buf = (uint8_t*)malloc(sz);
+	if (buf == NULL) {
+		LOGW("OOM: gimg_etc2_init_blank, edge %d", edge);
+		return NULL;
+	}
+
 	memset(buf, 0, sz);
 	
 	return buf;

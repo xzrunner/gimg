@@ -2,6 +2,8 @@
 
 #include <libjpeg/jpeglib.h>
 
+#include <logger.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -115,6 +117,10 @@ gimg_jpg_read(const char* filepath, int* width, int* height, int* channels) {
    *height = cinfo.output_height;
    *channels = cinfo.output_components;
    uint8_t* pixels = malloc(cinfo.output_width * cinfo.output_height * cinfo.output_components);
+   if (pixels == NULL) {
+	   LOGW("OOM: gimg_jpg_read, filepath %s, w %d, h %d", filepath, *width, *height);
+	   return NULL;
+   }
 
    /* Step 6: while (scan lines remain to be read) */
    /*           jpeg_read_scanlines(...); */
