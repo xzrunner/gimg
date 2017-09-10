@@ -1,5 +1,6 @@
 #include "gimg_bmp.h"
 #include "gimg_typedef.h"
+#include "gimg_utility.h"
 
 #include <fs_file.h>
 #include <fault.h>
@@ -70,7 +71,7 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 
 	if (c == 3) {
 		int dst_ptr = 0;
-		uint8_t data[line_sz];
+		ARRAY(uint8_t, data, line_sz);
 		for (int y = 0; y < h; ++y) {
 			int src_ptr= 0;
 			fs_read(file, data, line_sz);
@@ -86,7 +87,7 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 		}
 	} else {
 		int dst_ptr = 0;
-		uint8_t data[line_sz];
+		ARRAY(uint8_t, data, line_sz);
 		for (int y = 0; y < h; ++y) {
 			int src_ptr= 0;
 			fs_read(file, data, line_sz);
@@ -178,7 +179,7 @@ gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 
 //	fs_write(file, (void*)pixels, width * height * 3);
 
-	uint8_t buf[width * 3];
+	ARRAY(uint8_t, buf, width * 3);
 	int src_ptr = 0;
 	for (int y = 0; y < height; ++y) {
 		int dst_ptr = 0;

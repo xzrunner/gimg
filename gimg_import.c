@@ -162,7 +162,7 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 	}
 
 	int line_sz = width * channel;
-	uint8_t buf[line_sz];
+	ARRAY(uint8_t, buf, line_sz);
 	int bpos = 0, epos = line_sz * (height - 1);
  	for (int i = 0, n = floor(height / 2); i < n; ++i) {
  		memcpy(buf, &pixels[bpos], line_sz);

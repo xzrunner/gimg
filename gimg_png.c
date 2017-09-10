@@ -1,5 +1,6 @@
 #include "gimg_png.h"
 #include "gimg_typedef.h"
+#include "gimg_utility.h"
 
 #include <fs_file.h>
 #include <fault.h>
@@ -183,7 +184,7 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 		PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 	png_write_info(png_ptr, info_ptr);
 
-	uint8_t* row_pointers[height];
+	ARRAY(uint8_t*, row_pointers, height);
 	if (reverse) {
 		for (int y = 0; y < height; y++) {
 			row_pointers[height - 1 - y] = (uint8_t*)pixels + y * (width * bands_per_pixel * bit_depth / 8);
