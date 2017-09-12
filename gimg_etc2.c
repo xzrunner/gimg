@@ -32,7 +32,7 @@ uint8_t*
 gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 	if (!INITED) {
 		etcpack_init();
-		INITED;
+		INITED = true;
 	}
 
 	assert(IS_POT(width) && IS_POT(height));
