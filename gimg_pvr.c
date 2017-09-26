@@ -685,7 +685,7 @@ gimg_pvr_write_file(const char* filepath, const uint8_t* buf, int width, int hei
 		fault("Can't open pvr file: %s\n", filepath);
 	}
 
-	int sz = width * height * 0.5f;
+	int sz = (int)(width * height * 0.5f);
 
 	struct PVRTexHeader header;
 	memset(&header, 0, sizeof(header));
