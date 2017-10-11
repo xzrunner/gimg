@@ -418,16 +418,17 @@ _cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[
 	}	
 }
 
-uint8_t* 
+uint16_t* 
 gimg_pvr_decode(const uint8_t* buf, int width, int height) {
 	assert(width == height);
 
-	uint8_t* dst = (uint8_t*)malloc(width * height * 4);
+	size_t sz = width * height * 2;
+	uint16_t* dst = (uint16_t*)malloc(sz);
 	if (dst == NULL) {
 		LOGW("OOM: gimg_pvr_decode, w %d, h %d", width, height);
 		return NULL;
 	}
-	memset(dst, 0x00, width * height * 4);
+	memset(dst, 0x00, sz);
 
 	const int blocks = width >> 2;
 	const int block_mask = blocks - 1;
@@ -461,8 +462,12 @@ gimg_pvr_decode(const uint8_t* buf, int width, int height) {
 					c.b = (ca.b * w[0] + cb.b * w[1]) >> 7;
 					c.a = (ca.a * w[2] + cb.a * w[3]) >> 7;
 
-					int ptr = ((height - 1 - (py+y*4))*width+(px+x*4))*4;
-					memcpy(&dst[ptr], &c.r, sizeof(c));
+					int ptr = (height - 1 - (py+y*4))*width+(px+x*4);
+					dst[ptr] =
+						((c.r >> 4) << 12) |
+						((c.g >> 4) <<  8) |
+						((c.b >> 4) <<  4) |
+						 (c.a >> 4);
 
 					mod >>= 2;
 					factor++;					

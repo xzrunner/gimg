@@ -47,26 +47,26 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	case FILE_PVR:
 		{
 			uint8_t* compressed = gimg_pvr_read_file(filepath, width, height);
-			uint8_t* uncompressed = gimg_pvr_decode(compressed, *width, *height);
+			uint16_t* uncompressed = gimg_pvr_decode(compressed, *width, *height);
 			free(compressed);
 			pixels = uncompressed;
-			*format = GPF_RGBA;
+			*format = GPF_RGBA4;
 		}
 		break;
 	case FILE_PKM:
 		{
 			int type;
 			uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
-			uint8_t* uncompressed = gimg_etc2_decode(compressed, *width, *height, type);
+			uint16_t* uncompressed = gimg_etc2_decode(compressed, *width, *height, type);
 			free(compressed);
 			pixels = uncompressed;
-			*format = GPF_RGBA;
+			*format = GPF_RGBA4;
 		}
 		break;
 	default:
 		return pixels;
 	}
-	if (pixels && *format == GPF_RGBA) 
+	if (pixels && *format == GPF_RGBA8) 
 	{
 		gimg_remove_ghost_pixel(pixels, *width, *height);
 		gimg_format_pixels_alpha(pixels, *width, *height, 0);
@@ -156,8 +156,11 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 	case GPF_RGB:
 		channel = 3;
 		break;
-	case GPF_RGBA:
+	case GPF_RGBA8:
 		channel = 4;
+		break;
+	case GPF_RGBA4:
+		channel = 2;
 		break;
 	}
 
@@ -188,4 +191,28 @@ gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
 		}
 	}
 	return rgb;
+}
+
+uint8_t* 
+gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
+	size_t sz = width * height * 2;
+	uint16_t* dst = (uint16_t*)malloc(sz);
+	if (!dst) {
+		return NULL;
+	}
+	memset(dst, 0x00, sz);
+
+	uint16_t* dst_ptr = dst;
+	uint8_t*  src_ptr = pixels;
+	for (int i = 0, n = width * height; i < n; ++i) 
+	{
+		*dst_ptr =
+			((src_ptr[0] >> 4) << 12) |
+			((src_ptr[1] >> 4) <<  8) |
+			((src_ptr[2] >> 4) <<  4) |
+			((src_ptr[3] >> 4) <<  0);
+		++dst_ptr;
+		src_ptr += 4;
+	}
+	return dst;
 }

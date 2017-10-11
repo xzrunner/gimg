@@ -132,7 +132,7 @@ gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 	uint8_t* pixels = NULL;
 	if (bmih.biBitCount == 32) {
 		pixels = read_pixels(file, w, h, 4);
-		*format = GPF_RGBA;
+		*format = GPF_RGBA8;
 	} else if (bmih.biBitCount == 24) {
 		pixels = read_pixels(file, w, h, 3);
 		*format = GPF_RGB;
