@@ -21,7 +21,7 @@ enum DTEX_ETC_TYPE
 	ETC2PACKAGE_RG_SIGNED_NO_MIPMAPS
 };
 
-uint8_t* gimg_etc2_decode(const uint8_t* buf, int width, int height, int type);
+uint16_t* gimg_etc2_decode(const uint8_t* buf, int width, int height, int type);
 uint8_t* gimg_etc2_encode(const uint8_t* buf, int width, int height);
 
 uint8_t* gimg_etc2_read_file(const char* filepath, int* width, int* height, int* type);

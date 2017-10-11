@@ -9,7 +9,7 @@ extern "C"
 #include <stdint.h>
 
 // only support rgba 4bpp now
-uint8_t* gimg_pvr_decode(const uint8_t* buf, int width, int height);
+uint16_t* gimg_pvr_decode(const uint8_t* buf, int width, int height);
 uint8_t* gimg_pvr_encode(const uint8_t* buf, int width, int height);
 
 uint8_t* gimg_pvr_read_file(const char* filepath, int* width, int* height);

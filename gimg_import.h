@@ -18,6 +18,8 @@ void gimg_remove_ghost_pixel(uint8_t* pixels, int width, int height);
 void gimg_revert_y(uint8_t* pixels, int width, int height, int format);
 uint8_t* gimg_rgba2rgb(const uint8_t* pixels, int width, int height);
 
+uint8_t* gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height);
+
 #endif // gameimage_import_h
 
 #ifdef __cplusplus

@@ -28,7 +28,7 @@ read_color_block_etc(uint8_t** stream, unsigned int* block1, unsigned int* block
 
 static bool INITED = false;
 
-uint8_t* 
+uint16_t*
 gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 	if (!INITED) {
 		etcpack_init();
@@ -37,8 +37,8 @@ gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 
 	assert(IS_POT(width) && IS_POT(height));
 
-	int bpp = 4;
-	uint8_t* dst = (uint8_t*)malloc(width * height * bpp);
+	int bpp = 2;
+	uint16_t* dst = (uint16_t*)malloc(width * height * bpp);
 	if (dst == NULL) {
 		LOGW("OOM: gimg_etc2_decode, w %d, h %d", width, height);
 		return NULL;
@@ -64,8 +64,11 @@ gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 				lw = MIN(x + 4, width) - x;
 				for (ly = 0; ly < lh; ly++,lb+=4*4)
 					for(lx = 0; lx < lw; lx++) {
-						memcpy(dst + (width*(y + ly) + x + lx)*bpp, lb + lx*4, 3);
-						memcpy(dst + (width*(y + ly) + x + lx)*bpp + 3, &default_alpha, 1);
+						dst[width*(y + ly) + x + lx] =
+							((*(lb + lx * 4) >> 4) << 12) |
+							((*(lb + lx * 4 + 1) >> 4) << 8) |
+							((*(lb + lx * 4 + 2) >> 4) << 4) |
+							((default_alpha) >> 4);
 					}
 				break;
 			case ETC2PACKAGE_RGBA_NO_MIPMAPS:
@@ -77,9 +80,13 @@ gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 				lb = rgba;
 				lh = MIN(y + 4, height) - y;
 				lw = MIN(x + 4, width) - x;
-				for (ly = 0; ly < lh; ++ly, lb += 4*4)
-					for(lx = 0; lx < lw; ++lx)
-						memcpy(dst + (width * (y + ly) + x + lx) * bpp, lb + lx * 4, 4);
+				for (ly = 0; ly < lh; ++ly, lb += 4 * 4)
+					for (lx = 0; lx < lw; ++lx)
+						dst[width*(y + ly) + x + lx] =
+							((*(lb + lx * 4) >> 4) << 12) |
+							((*(lb + lx * 4 + 1) >> 4) << 8) |
+							((*(lb + lx * 4 + 2) >> 4) << 4) |
+							((*(lb + lx * 4 + 3) >> 4));
 				break;
 			case ETC2PACKAGE_RGBA1_NO_MIPMAPS:
 				read_color_block_etc(&ptr_src, &block1, &block2);
@@ -89,7 +96,11 @@ gimg_etc2_decode(const uint8_t* buf, int width, int height, int type) {
 				lw = MIN(x + 4, width) - x;
 				for (ly = 0; ly < lh; ly++,lb+=4*4)
 					for(lx = 0; lx < lw; lx++)
-						memcpy(dst + (width*(y + ly) + x + lx)*bpp, lb + lx*4, 4);
+						dst[width*(y + ly) + x + lx] =
+							((*(lb + lx * 4) >> 4) << 12) |
+							((*(lb + lx * 4 + 1) >> 4) << 8) |
+							((*(lb + lx * 4 + 2) >> 4) << 4) |
+							((*(lb + lx * 4 + 3) >> 4));
 				break;
 			}
 		}

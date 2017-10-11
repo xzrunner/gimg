@@ -97,13 +97,13 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		{
 		case PNG_COLOR_TYPE_PALETTE:
 			png_set_palette_to_rgb(lPngPtr);
-			*format = lTransparency ? GPF_RGBA : GPF_RGB;
+			*format = lTransparency ? GPF_RGBA8 : GPF_RGB;
 			break;
 		case PNG_COLOR_TYPE_RGB:
-			*format = lTransparency ? GPF_RGBA : GPF_RGB;
+			*format = lTransparency ? GPF_RGBA8 : GPF_RGB;
 			break;
 		case PNG_COLOR_TYPE_RGBA:
-			*format = GPF_RGBA;
+			*format = GPF_RGBA8;
 			break;
 		case PNG_COLOR_TYPE_GRAY:
 			png_set_expand_gray_1_2_4_to_8(lPngPtr);
@@ -153,7 +153,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 
 int 
 gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
-	if (format != GPF_RGB && format != GPF_RGBA) {
+	if (format != GPF_RGB && format != GPF_RGBA8) {
 		return -1;
 	}
 
