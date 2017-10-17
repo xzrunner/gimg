@@ -1,6 +1,7 @@
 #include "gimg_import.h"
 #include "gimg_utility.h"
 #include "gimg_typedef.h"
+#include "gimg_math.h"
 
 #include "gimg_png.h"
 #include "gimg_jpg.h"
@@ -47,20 +48,20 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	case FILE_PVR:
 		{
 			uint8_t* compressed = gimg_pvr_read_file(filepath, width, height);
-			uint16_t* uncompressed = gimg_pvr_decode(compressed, *width, *height);
+			uint8_t* uncompressed = gimg_pvr_decode_rgba8(compressed, *width, *height);
 			free(compressed);
 			pixels = uncompressed;
-			*format = GPF_RGBA4;
+			*format = GPF_RGBA8;
 		}
 		break;
 	case FILE_PKM:
 		{
 			int type;
 			uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
-			uint16_t* uncompressed = gimg_etc2_decode(compressed, *width, *height, type);
+			uint8_t* uncompressed = gimg_etc2_decode_rgba8(compressed, *width, *height, type);
 			free(compressed);
 			pixels = uncompressed;
-			*format = GPF_RGBA4;
+			*format = GPF_RGBA8;
 		}
 		break;
 	default:
@@ -214,5 +215,89 @@ gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 		++dst_ptr;
 		src_ptr += 4;
 	}
-	return dst;
+	return (uint8_t*)dst;
+}
+
+// Floyd-Steinberg
+uint8_t* 
+gimg_rgba8_to_rgba4_dither(const uint8_t* pixels, int width, int height) {
+	size_t sz = width * height * 2;
+	uint16_t* dst = (uint16_t*)malloc(sz);
+	if (!dst) {
+		return NULL;
+	}
+	memset(dst, 0x00, sz);
+
+	int old_r, old_g, old_b, old_a;
+	int new_r, new_g, new_b, new_a;
+	int err_r, err_g, err_b, err_a;
+	uint16_t* dst_ptr = dst;
+	uint8_t*  src_ptr = pixels;
+	for (int y = 0; y < height; ++y) {
+		for (int x = 0; x < width; ++x) {
+			old_r = src_ptr[0];
+			old_g = src_ptr[1];
+			old_b = src_ptr[2];
+			old_a = src_ptr[3];
+			new_r = (old_r >> 4) << 4;
+			new_g = (old_g >> 4) << 4;
+			new_b = (old_b >> 4) << 4;
+			new_a = (old_a >> 4) << 4;
+			err_r = old_r - new_r;
+			err_g = old_g - new_g;
+			err_b = old_b - new_b;
+			err_a = old_a - new_a;
+
+			// x + 1, y
+			if (x != width - 1) {
+				uint8_t* ptr = src_ptr + 4;
+				float f = 7.0f / 16.0f;
+				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+			}
+
+			// x - 1, y + 1
+			if (x != 0 && y != height - 1) {
+				uint8_t* ptr = src_ptr + 4 * (width - 1);
+				float f = 3.0f / 16.0f;
+				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+			}
+
+			// x, y + 1
+			if (y != height - 1) {
+				uint8_t* ptr = src_ptr + 4 * width;
+				float f = 5.0f / 16.0f;
+				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+			}
+
+			// x + 1, y + 1
+			if (x != width - 1 && y != height - 1) {
+				uint8_t* ptr = src_ptr + 4 * (width + 1);
+				float f = 1.0f / 16.0f;
+				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+			}
+
+			*dst_ptr =
+				(((new_r & 0xff) >> 4) << 12) |
+				(((new_g & 0xff) >> 4) << 8) |
+				(((new_b & 0xff) >> 4) << 4) |
+				(((new_a & 0xff) >> 4) << 0);
+
+			++dst_ptr;
+			src_ptr += 4;
+		}
+	}
+
+	return (uint8_t*)dst;
 }
