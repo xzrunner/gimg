@@ -418,14 +418,14 @@ _cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[
 	}	
 }
 
-uint16_t* 
-gimg_pvr_decode(const uint8_t* buf, int width, int height) {
+uint8_t* 
+gimg_pvr_decode_rgba4(const uint8_t* buf, int width, int height) {
 	assert(width == height);
 
 	size_t sz = width * height * 2;
 	uint16_t* dst = (uint16_t*)malloc(sz);
 	if (dst == NULL) {
-		LOGW("OOM: gimg_pvr_decode, w %d, h %d", width, height);
+		LOGW("OOM: gimg_pvr_decode_rgba4, w %d, h %d", width, height);
 		return NULL;
 	}
 	memset(dst, 0x00, sz);
@@ -471,6 +471,62 @@ gimg_pvr_decode(const uint8_t* buf, int width, int height) {
 
 					mod >>= 2;
 					factor++;					
+				}
+			}
+		}
+	}
+
+	return (uint8_t*)dst;
+}
+
+uint8_t*
+gimg_pvr_decode_rgba8(const uint8_t* buf, int width, int height) {
+	assert(width == height);
+
+	uint8_t* dst = (uint8_t*)malloc(width * height * 4);
+	if (dst == NULL) {
+		LOGW("OOM: gimg_pvr_decode_rgba8, w %d, h %d", width, height);
+		return NULL;
+	}
+	memset(dst, 0x00, width * height * 4);
+
+	const int blocks = width >> 2;
+	const int block_mask = blocks - 1;
+	const struct pvrtc_packet* packets = (const struct pvrtc_packet*)buf;
+
+	for (int y = 0; y < blocks; ++y) {
+		for (int x = 0; x < blocks; ++x) {
+			const struct pvrtc_packet* packet = packets + GetMortonNumber(x, y);
+
+			unsigned mod = packet->modulationData;
+			const unsigned char(*weights)[4] = WEIGHTS + 4 * packet->usePunchthroughAlpha;
+			const unsigned char(*factor)[4] = BILINEAR_FACTORS;
+
+			for (int py = 0; py < 4; ++py) {
+				const int yoffset = (py < 2) ? -1 : 0;
+				const int y0 = (y + yoffset) & block_mask;
+				const int y1 = (y0 + 1) & block_mask;
+
+				for (int px = 0; px < 4; ++px) {
+					const int xoffset = (px < 2) ? -1 : 0;
+					const int x0 = (x + xoffset) & block_mask;
+					const int x1 = (x0 + 1) & block_mask;
+
+					struct color_rgba_int ca, cb;
+					_cal_color_ab(packets, factor, x0, x1, y0, y1, &ca, &cb);
+
+					const unsigned char* w = weights[mod & 3];
+					struct color_rgba_char c;
+					c.r = (ca.r * w[0] + cb.r * w[1]) >> 7;
+					c.g = (ca.g * w[0] + cb.g * w[1]) >> 7;
+					c.b = (ca.b * w[0] + cb.b * w[1]) >> 7;
+					c.a = (ca.a * w[2] + cb.a * w[3]) >> 7;
+
+					int ptr = ((height - 1 - (py + y * 4))*width + (px + x * 4)) * 4;
+					memcpy(&dst[ptr], &c.r, sizeof(c));
+
+					mod >>= 2;
+					factor++;
 				}
 			}
 		}
