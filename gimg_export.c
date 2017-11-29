@@ -3,6 +3,7 @@
 #include "gimg_typedef.h"
 
 #include "gimg_png.h"
+#include "gimg_jpg.h"
 #include "gimg_bmp.h"
 
 int 
@@ -13,6 +14,9 @@ gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, int forma
 	switch (type) {
 	case FILE_PNG:
 		ret = gimg_png_write(filepath, pixels, w, h, format, reverse);
+		break;
+	case FILE_JPG:
+		ret = gimg_jpg_write(filepath, pixels, w, h, 80);
 		break;
 	case FILE_BMP:
 		if (format == GPF_RGB) {

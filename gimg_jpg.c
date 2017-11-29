@@ -254,13 +254,22 @@ gimg_jpg_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	*/
 	row_stride = width * 3;	/* JSAMPLEs per row in data */
 
+	//while (cinfo.next_scanline < cinfo.image_height) {
+	//	/* jpeg_write_scanlines expects an array of pointers to scanlines.
+	//	* Here the array is only one element long, but you could pass
+	//	* more than one scanline at a time if that's more convenient.
+	//	*/
+	//	row_pointer[0] = (uint8_t*)(&pixels[cinfo.next_scanline * row_stride]);
+	//	(void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
+	//}
+	// flip y
 	while (cinfo.next_scanline < cinfo.image_height) {
 		/* jpeg_write_scanlines expects an array of pointers to scanlines.
 		* Here the array is only one element long, but you could pass
 		* more than one scanline at a time if that's more convenient.
 		*/
-		row_pointer[0] = (uint8_t*)(&pixels[cinfo.next_scanline * row_stride]);
-		(void) jpeg_write_scanlines(&cinfo, row_pointer, 1);
+		row_pointer[0] = (uint8_t*)(&pixels[(cinfo.image_height - 1 - cinfo.next_scanline) * row_stride]);
+		(void)jpeg_write_scanlines(&cinfo, row_pointer, 1);
 	}
 
 	/* Step 6: Finish compression */
