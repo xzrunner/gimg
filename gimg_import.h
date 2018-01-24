@@ -7,10 +7,11 @@ extern "C"
 #define gameimage_import_h
 
 #include <stdint.h>
+#include <stdbool.h>
 
 uint8_t* gimg_import(const char* filepath, int* width, int* height, int* format);
 
-int  gimg_read_header(const char* filepath, int* width, int* height);
+bool gimg_read_header(const char* filepath, int* width, int* height);
 
 void gimg_format_pixels_alpha(uint8_t* pixels, int width, int height, int val);
 void gimg_pre_mul_alpha(uint8_t* pixels, int width, int height);

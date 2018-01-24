@@ -75,14 +75,16 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	return pixels;
 }
 
-int 
+bool 
 gimg_read_header(const char* filepath, int* width, int* height) {
-	int ret = -1;
+	bool ret = true;
 	int type = gimg_file_type(filepath);
 	switch (type) {
 	case FILE_PNG:
 		gimg_png_read_header(filepath, width, height);
 		break;
+	default:
+		ret = false;
 	}
 	return ret;
 }
