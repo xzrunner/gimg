@@ -205,8 +205,8 @@ gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 	}
 	memset(dst, 0x00, sz);
 
-	uint16_t* dst_ptr = dst;
-	uint8_t*  src_ptr = pixels;
+	uint16_t*      dst_ptr = dst;
+	const uint8_t* src_ptr = pixels;
 	for (int i = 0, n = width * height; i < n; ++i) 
 	{
 		*dst_ptr =
@@ -222,7 +222,7 @@ gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 
 // Floyd-Steinberg
 uint8_t* 
-gimg_rgba8_to_rgba4_dither(const uint8_t* pixels, int width, int height) {
+gimg_rgba8_to_rgba4_dither(uint8_t* pixels, int width, int height) {
 	size_t sz = width * height * 2;
 	uint16_t* dst = (uint16_t*)malloc(sz);
 	if (!dst) {
@@ -254,40 +254,40 @@ gimg_rgba8_to_rgba4_dither(const uint8_t* pixels, int width, int height) {
 			if (x != width - 1) {
 				uint8_t* ptr = src_ptr + 4;
 				float f = 7.0f / 16.0f;
-				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
-				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
-				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
-				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+				ptr[0] = MIN(255, MAX(0, ptr[0] + (int)(f * err_r)));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + (int)(f * err_g)));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + (int)(f * err_b)));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + (int)(f * err_a)));
 			}
 
 			// x - 1, y + 1
 			if (x != 0 && y != height - 1) {
 				uint8_t* ptr = src_ptr + 4 * (width - 1);
 				float f = 3.0f / 16.0f;
-				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
-				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
-				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
-				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+				ptr[0] = MIN(255, MAX(0, ptr[0] + (int)(f * err_r)));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + (int)(f * err_g)));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + (int)(f * err_b)));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + (int)(f * err_a)));
 			}
 
 			// x, y + 1
 			if (y != height - 1) {
 				uint8_t* ptr = src_ptr + 4 * width;
 				float f = 5.0f / 16.0f;
-				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
-				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
-				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
-				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+				ptr[0] = MIN(255, MAX(0, ptr[0] + (int)(f * err_r)));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + (int)(f * err_g)));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + (int)(f * err_b)));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + (int)(f * err_a)));
 			}
 
 			// x + 1, y + 1
 			if (x != width - 1 && y != height - 1) {
 				uint8_t* ptr = src_ptr + 4 * (width + 1);
 				float f = 1.0f / 16.0f;
-				ptr[0] = MIN(255, MAX(0, ptr[0] + f * err_r));
-				ptr[1] = MIN(255, MAX(0, ptr[1] + f * err_g));
-				ptr[2] = MIN(255, MAX(0, ptr[2] + f * err_b));
-				ptr[3] = MIN(255, MAX(0, ptr[3] + f * err_a));
+				ptr[0] = MIN(255, MAX(0, ptr[0] + (int)(f * err_r)));
+				ptr[1] = MIN(255, MAX(0, ptr[1] + (int)(f * err_g)));
+				ptr[2] = MIN(255, MAX(0, ptr[2] + (int)(f * err_b)));
+				ptr[3] = MIN(255, MAX(0, ptr[3] + (int)(f * err_a)));
 			}
 
 			*dst_ptr =
