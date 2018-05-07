@@ -3,10 +3,10 @@ extern "C"
 {
 #endif
 
-#include <stdint.h>
-
 #ifndef gameimage_etc2_h
 #define gameimage_etc2_h
+
+#include <stdint.h>
 
 enum DTEX_ETC_TYPE
 {

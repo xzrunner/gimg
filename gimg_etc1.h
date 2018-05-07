@@ -3,10 +3,10 @@ extern "C"
 {
 #endif
 
-#include <stdint.h>
-
 #ifndef gameimage_etc1_h
 #define gameimage_etc1_h
+
+#include <stdint.h>
 
 uint8_t* gimg_etc1_decode(const uint8_t* buf, int width, int height);
 uint8_t* gimg_etc1_encode(const uint8_t* buf, int width, int height);

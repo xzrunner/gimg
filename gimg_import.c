@@ -9,6 +9,7 @@
 #include "gimg_ppm.h"
 #include "gimg_pvr.h"
 #include "gimg_etc2.h"
+#include "gimg_dds.h"
 
 #include <logger.h>
 
@@ -17,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint8_t* 
+uint8_t*
 gimg_import(const char* filepath, int* width, int* height, int* format) {
 	uint8_t* pixels = NULL;
 	int type = gimg_file_type(filepath);
@@ -64,10 +65,13 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 			*format = GPF_RGBA8;
 		}
 		break;
+	case FILE_DDS:
+		pixels = gimg_dds_read_file(filepath, width, height, format);
+		break;
 	default:
 		return pixels;
 	}
-	if (pixels && *format == GPF_RGBA8) 
+	if (pixels && *format == GPF_RGBA8)
 	{
 		gimg_remove_ghost_pixel(pixels, *width, *height);
 		gimg_format_pixels_alpha(pixels, *width, *height, 0);
@@ -75,7 +79,7 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	return pixels;
 }
 
-bool 
+bool
 gimg_read_header(const char* filepath, int* width, int* height) {
 	bool ret = true;
 	int type = gimg_file_type(filepath);
@@ -89,7 +93,7 @@ gimg_read_header(const char* filepath, int* width, int* height) {
 	return ret;
 }
 
-void 
+void
 gimg_format_pixels_alpha(uint8_t* pixels, int width, int height, int val) {
 	int ptr = 0;
 	for (int i = 0; i < height; ++i) {
@@ -109,7 +113,7 @@ gimg_format_pixels_alpha(uint8_t* pixels, int width, int height, int val) {
 	}
 }
 
-void 
+void
 gimg_pre_mul_alpha(uint8_t* pixels, int width, int height) {
 	int pos = 0;
 	for (int y = 0; y < height; ++y) {
@@ -123,7 +127,7 @@ gimg_pre_mul_alpha(uint8_t* pixels, int width, int height) {
 	}
 }
 
-void 
+void
 gimg_remove_ghost_pixel(uint8_t* pixels, int width, int height) {
 	int ptr = 0;
 	for (int i = 0; i < height; ++i) {
@@ -148,7 +152,7 @@ gimg_remove_ghost_pixel(uint8_t* pixels, int width, int height) {
 	}
 }
 
-void 
+void
 gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 	int channel = 0;
 	switch (format)
@@ -179,7 +183,7 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
  	}
 }
 
-uint8_t* 
+uint8_t*
 gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
 	uint8_t* rgb = (uint8_t*)malloc(width*height*3);
 	if (rgb == NULL) {
@@ -196,7 +200,7 @@ gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
 	return rgb;
 }
 
-uint8_t* 
+uint8_t*
 gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 	size_t sz = width * height * 2;
 	uint16_t* dst = (uint16_t*)malloc(sz);
@@ -207,7 +211,7 @@ gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 
 	uint16_t*      dst_ptr = dst;
 	const uint8_t* src_ptr = pixels;
-	for (int i = 0, n = width * height; i < n; ++i) 
+	for (int i = 0, n = width * height; i < n; ++i)
 	{
 		*dst_ptr =
 			((src_ptr[0] >> 4) << 12) |
@@ -221,7 +225,7 @@ gimg_rgba8_to_rgba4(const uint8_t* pixels, int width, int height) {
 }
 
 // Floyd-Steinberg
-uint8_t* 
+uint8_t*
 gimg_rgba8_to_rgba4_dither(uint8_t* pixels, int width, int height) {
 	size_t sz = width * height * 2;
 	uint16_t* dst = (uint16_t*)malloc(sz);
