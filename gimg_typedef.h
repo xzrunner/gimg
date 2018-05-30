@@ -15,6 +15,7 @@ enum GIMG_FILE {
 	FILE_PVR,
 	FILE_PKM,
 	FILE_DDS,
+	FILE_TGA,
 };
 
 enum GIMG_IMAGE_TYPE {

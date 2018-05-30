@@ -10,6 +10,7 @@
 #include "gimg_pvr.h"
 #include "gimg_etc2.h"
 #include "gimg_dds.h"
+#include "gimg_tga.h"
 
 #include <logger.h>
 
@@ -67,6 +68,9 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		break;
 	case FILE_DDS:
 		pixels = gimg_dds_read_file(filepath, width, height, format);
+		break;
+	case FILE_TGA:
+		pixels = gimg_tga_read_file(filepath, width, height, format);
 		break;
 	default:
 		return pixels;

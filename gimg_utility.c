@@ -33,10 +33,14 @@ gimg_file_type(const char* filepath) {
 		       tolower(filepath[n-2]) == 'k' &&
 		       tolower(filepath[n-1]) == 'm') {
 		return FILE_PKM;
-	} else if (tolower(filepath[n-3]) == 'd' &&
-		       tolower(filepath[n-2]) == 'd' &&
-		       tolower(filepath[n-1]) == 's') {
+	} else if (tolower(filepath[n - 3]) == 'd' &&
+		       tolower(filepath[n - 2]) == 'd' &&
+		       tolower(filepath[n - 1]) == 's') {
 		return FILE_DDS;
+	} else if (tolower(filepath[n - 3]) == 't' &&
+		       tolower(filepath[n - 2]) == 'g' &&
+		       tolower(filepath[n - 1]) == 'a') {
+		return FILE_TGA;
 	} else {
 		return GIMG_FILE_INVALID;
 	}
