@@ -29,10 +29,11 @@ typedef struct
 } TGA;
 
 static char uTGAcompare[12] = { 0,0,2, 0,0,0,0,0,0,0,0,0 };
+static char uAlphaTGAcompare[12] = { 0,0,3, 0,0,0,0,0,0,0,0,0 };
 static char cTGAcompare[12] = { 0,0,10,0,0,0,0,0,0,0,0,0 };
 
 static uint8_t*
-_load_uncompressed(struct fs_file* file, int* width, int* height, int* format) {
+_load_uncompressed_color(struct fs_file* file, int* width, int* height, int* format) {
 	TGA tga;
 	if (fs_read(file, tga.header, sizeof(tga.header)) != sizeof(tga.header)) {
 		return NULL;
@@ -69,6 +70,40 @@ _load_uncompressed(struct fs_file* file, int* width, int* height, int* format) {
 
 	for (int cswap = 0; cswap < (int)tga.image_size; cswap += tga.bytes_per_pixel) {
 		pixels[cswap] ^= pixels[cswap + 2] ^= pixels[cswap] ^= pixels[cswap + 2];
+	}
+
+	return pixels;
+}
+
+static uint8_t*
+_load_uncompressed_alpha(struct fs_file* file, int* width, int* height, int* format) {
+	TGA tga;
+	if (fs_read(file, tga.header, sizeof(tga.header)) != sizeof(tga.header)) {
+		return NULL;
+	}
+
+	*width = tga.header[1] * 256 + tga.header[0];
+	*height = tga.header[3] * 256 + tga.header[2];
+	size_t bpp = tga.header[4];
+	tga.width = *width;
+	tga.height = *height;
+	tga.bpp = bpp;
+
+	if (*width <= 0 || *height <= 0 || (bpp != 8)) {
+		return NULL;
+	}
+
+	*format = GPF_ALPHA;
+
+	tga.bytes_per_pixel = tga.bpp / 8;
+	tga.image_size = tga.bytes_per_pixel * tga.width * tga.height;
+	uint8_t* pixels = (uint8_t*)malloc(tga.image_size);
+	if (pixels == NULL) {
+		return pixels;
+	}
+
+	if (fs_read(file, pixels, tga.image_size) != tga.image_size) {
+		return NULL;
 	}
 
 	return pixels;
@@ -208,7 +243,9 @@ gimg_tga_read_file(const char* filepath, int* width, int* height, int* format) {
 	}
 
 	if (memcmp(uTGAcompare, &tgaheader, sizeof(tgaheader)) == 0) {
-		return _load_uncompressed(file, width, height, format);
+		return _load_uncompressed_color(file, width, height, format);
+	} else if (memcmp(uAlphaTGAcompare, &tgaheader, sizeof(tgaheader)) == 0) {
+		return _load_uncompressed_alpha(file, width, height, format);
 	} else if (memcmp(cTGAcompare, &tgaheader, sizeof(tgaheader)) == 0) {
 		return _load_compressed(file, width, height, format);
 	} else {
