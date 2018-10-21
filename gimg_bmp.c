@@ -54,7 +54,7 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 
 	int line_sz;
 	if (c == 3) {
-		int padding = 0; 
+		int padding = 0;
 		while ((w * 3 + padding) % 4 != 0) {
 			padding++;
 		}
@@ -107,7 +107,7 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 	return pixels;
 }
 
-uint8_t* 
+uint8_t*
 gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
@@ -145,7 +145,7 @@ gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 	return pixels;
 }
 
-int 
+int
 gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int height) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {

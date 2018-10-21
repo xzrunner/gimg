@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-uint8_t* 
+uint8_t*
 gimg_etc1_decode(const uint8_t* buf, int width, int height) {
 	assert(IS_POT(width) && IS_POT(height));
 
@@ -33,12 +33,12 @@ gimg_etc1_decode(const uint8_t* buf, int width, int height) {
 				memcpy(dst + ((y * 4 + iy) * width + x * 4) * 4, block + 4 * iy, 16);
 			}
 		}
-	}	
+	}
 
 	return dst;
 }
 
-uint8_t* 
+uint8_t*
 gimg_etc1_encode(const uint8_t* buf, int width, int height) {
 	assert(IS_POT(width) && IS_POT(height));
 
@@ -79,13 +79,13 @@ struct PKMHeader {
 	unsigned char heightLSB;
 };
 
-uint8_t* 
+uint8_t*
 gimg_etc1_read_file(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open etc1 file: %s\n", filepath);
 	}
-	
+
 	struct PKMHeader header;
 	fs_read(file, &header, sizeof(header));
 
@@ -100,7 +100,7 @@ gimg_etc1_read_file(const char* filepath, int* width, int* height) {
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
 	}
-	fs_close(file);	
+	fs_close(file);
 
 	return buf;
 }

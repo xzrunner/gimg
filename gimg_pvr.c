@@ -27,7 +27,7 @@ struct color_rgba_int {
 	int r, g, b, a;
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_5_TO_8[32] = {
  0, 8, 16, 24, 32, 41, 49, 57, 65, 74,
  82, 90, 98, 106, 115, 123, 131, 139, 148, 156,
@@ -35,18 +35,18 @@ BITSCALE_5_TO_8[32] = {
  246, 255
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_4_TO_8[16] = {
  0, 17, 34, 51, 68, 85, 102, 119, 136, 153,
  170, 187, 204, 221, 238, 255
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_3_TO_8[8] = {
  0, 36, 72, 109, 145, 182, 218, 255
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_5_FLOOR[256] = {
  0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
  1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
@@ -76,7 +76,7 @@ BITSCALE_8_TO_5_FLOOR[256] = {
  30, 30, 30, 30, 30, 31
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_4_FLOOR[256] = {
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
@@ -106,7 +106,7 @@ BITSCALE_8_TO_4_FLOOR[256] = {
  14, 14, 14, 14, 14, 15
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_3_FLOOR[256] = {
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -136,7 +136,7 @@ BITSCALE_8_TO_3_FLOOR[256] = {
  6, 6, 6, 6, 6, 7
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_5_CEIL[256] = {
  0, 1, 1, 1, 1, 1, 1, 1, 1, 2,
  2, 2, 2, 2, 2, 2, 2, 3, 3, 3,
@@ -166,7 +166,7 @@ BITSCALE_8_TO_5_CEIL[256] = {
  31, 31, 31, 31, 31, 31
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_4_CEIL[256] = {
  0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
  1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
@@ -196,7 +196,7 @@ BITSCALE_8_TO_4_CEIL[256] = {
  15, 15, 15, 15, 15, 15
 };
 
-static const uint8_t 
+static const uint8_t
 BITSCALE_8_TO_3_CEIL[256] = {
  0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
  1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -240,7 +240,7 @@ GetColorRgbaA(const struct pvrtc_packet* packet, struct color_rgba_int* col) {
 		unsigned char a = packet->colorA >> 11 & 7;
 		unsigned char r = packet->colorA >> 7 & 0xf;
 		unsigned char g = packet->colorA >> 3 & 0xf;
-		unsigned char b = packet->colorA & 7;		
+		unsigned char b = packet->colorA & 7;
 		col->r = BITSCALE_4_TO_8[r];
 		col->g = BITSCALE_4_TO_8[g];
 		col->b = BITSCALE_3_TO_8[b];
@@ -267,7 +267,7 @@ GetColorRgbaB(const struct pvrtc_packet* packet, struct color_rgba_int* col) {
 		col->g = BITSCALE_4_TO_8[g];
 		col->b = BITSCALE_4_TO_8[b];
 		col->a = BITSCALE_3_TO_8[a];
-	}	
+	}
 }
 
 static inline void
@@ -285,7 +285,7 @@ SetColorA(struct pvrtc_packet* packet, struct color_rgba_char* col) {
 		int b = BITSCALE_8_TO_3_FLOOR[col->b];
 		packet->colorA = a<<11 | r<<7 | g<<3 | b;
 		packet->colorAIsOpaque = false;
-	}	
+	}
 }
 
 static inline void
@@ -306,23 +306,23 @@ SetColorB(struct pvrtc_packet* packet, struct color_rgba_char* col) {
 	}
 }
 
-static const unsigned char 
+static const unsigned char
 BILINEAR_FACTORS[16][4] = {
 	{ 4, 4, 4, 4 },
 	{ 2, 6, 2, 6 },
 	{ 8, 0, 8, 0 },
 	{ 6, 2, 6, 2 },
-	
+
 	{ 2, 2, 6, 6 },
 	{ 1, 3, 3, 9 },
 	{ 4, 0, 12, 0 },
 	{ 3, 1, 9, 3 },
-	
+
 	{ 8, 8, 0, 0 },
 	{ 4, 12, 0, 0 },
 	{ 16, 0, 0, 0 },
 	{ 12, 4, 0, 0 },
-	
+
 	{ 6, 6, 2, 2 },
 	{ 3, 9, 1, 3 },
 	{ 12, 0, 4, 0 },
@@ -330,14 +330,14 @@ BILINEAR_FACTORS[16][4] = {
 };
 
 // Weights are { colorA, colorB, alphaA, alphaB }
-static const unsigned char 
+static const unsigned char
 WEIGHTS[8][4] = {
 	// Weights for Mode=0
 	{ 8, 0, 8, 0 },
 	{ 5, 3, 5, 3 },
 	{ 3, 5, 3, 5 },
 	{ 0, 8, 0, 8 },
-	
+
 	// Weights for Mode=1
 	{ 8, 0, 8, 0 },
 	{ 4, 4, 4, 4 },
@@ -345,7 +345,7 @@ WEIGHTS[8][4] = {
 	{ 0, 8, 0, 8 },
 };
 
-static const unsigned short 
+static const unsigned short
 MORTON_TABLE[256] = {
     0x0000, 0x0001, 0x0004, 0x0005, 0x0010, 0x0011, 0x0014, 0x0015,
     0x0040, 0x0041, 0x0044, 0x0045, 0x0050, 0x0051, 0x0054, 0x0055,
@@ -381,13 +381,13 @@ MORTON_TABLE[256] = {
     0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
 };
 
-static inline unsigned 
+static inline unsigned
 GetMortonNumber(int x, int y) {
     return MORTON_TABLE[x >> 8] << 17 | MORTON_TABLE[y >> 8] << 16 | MORTON_TABLE[x & 0xFF] << 1 | MORTON_TABLE[y & 0xFF];
 }
 
 static inline void
-_cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[4], 
+_cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[4],
 	int x0, int x1, int y0, int y1, struct color_rgba_int* ca, struct color_rgba_int* cb) {
 	const struct pvrtc_packet* p[4];
 	p[0] = packets + GetMortonNumber(x0, y0);
@@ -403,7 +403,7 @@ _cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[
 		ca->r += c.r * f;
 		ca->g += c.g * f;
 		ca->b += c.b * f;
-		ca->a += c.a * f;						
+		ca->a += c.a * f;
 	}
 
 	memset(cb, 0, sizeof(*cb));
@@ -415,10 +415,10 @@ _cal_color_ab(const struct pvrtc_packet* packets, const unsigned char (*factor)[
 		cb->g += c.g * f;
 		cb->b += c.b * f;
 		cb->a += c.a * f;
-	}	
+	}
 }
 
-uint8_t* 
+uint8_t*
 gimg_pvr_decode_rgba4(const uint8_t* buf, int width, int height) {
 	assert(width == height);
 
@@ -454,7 +454,7 @@ gimg_pvr_decode_rgba4(const uint8_t* buf, int width, int height) {
 
 					struct color_rgba_int ca, cb;
 					_cal_color_ab(packets, factor, x0, x1, y0, y1, &ca, &cb);
-					
+
 					const unsigned char* w = weights[mod & 3];
 					struct color_rgba_char c;
 					c.r = (ca.r * w[0] + cb.r * w[1]) >> 7;
@@ -470,7 +470,7 @@ gimg_pvr_decode_rgba4(const uint8_t* buf, int width, int height) {
 						 (c.a >> 4);
 
 					mod >>= 2;
-					factor++;					
+					factor++;
 				}
 			}
 		}
@@ -571,10 +571,10 @@ _rotate_right(unsigned int value, unsigned int shift) {
     if ((shift &= sizeof(value) * 8 - 1) == 0) {
         return value;
     }
-    return (value >> shift) | (value << (sizeof(value) * 8 - shift));	
+    return (value >> shift) | (value << (sizeof(value) * 8 - shift));
 }
 
-uint8_t* 
+uint8_t*
 gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 	assert(width == height && IS_POT(width));
 
@@ -584,14 +584,14 @@ gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 		LOGW("OOM: gimg_pvr_encode, w %d, h %d", width, height);
 		return NULL;
 	}
-	memset(dst, 0x00, sz);	
+	memset(dst, 0x00, sz);
 
 	const int size = width;
 	const int blocks = size >> 2;
 	const int block_mask = blocks - 1;
 
 	struct pvrtc_packet* packets = (struct pvrtc_packet*)dst;
-	
+
 	for (int y = 0; y < blocks; ++y) {
 		for (int x = 0; x < blocks; ++x) {
 			struct col_bounding_box cbb;
@@ -613,7 +613,7 @@ gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 				const int yoffset = (py < 2) ? -1 : 0;
 				const int y0 = (y + yoffset) & block_mask;
 				const int y1 = (y0 + 1) & block_mask;
-				
+
 				for(int px = 0; px < 4; ++px) {
 					const int xoffset = (px < 2) ? -1 : 0;
 					const int x0 = (x + xoffset) & block_mask;
@@ -639,7 +639,7 @@ gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 					v.r = p.r - ca.r;
 					v.g = p.g - ca.g;
 					v.b = p.b - ca.b;
-					v.a = p.a - ca.a;	
+					v.a = p.a - ca.a;
 
 					// PVRTC uses weightings of 0, 3/8, 5/8 and 1
 					// The boundaries for these are 3/16, 1/2 (=8/16), 13/16
@@ -647,7 +647,7 @@ gimg_pvr_encode(const uint8_t* buf, int width, int height) {
 					int len_squared = _color_mul(&d, &d);
 					if (projection > 3 * len_squared) modulationData++;
 					if (projection > 8 * len_squared) modulationData++;
-					if (projection > 13 * len_squared) modulationData++;					
+					if (projection > 13 * len_squared) modulationData++;
 
 					modulationData = _rotate_right(modulationData, 2);
 
@@ -693,14 +693,14 @@ struct PVRTexHeaderV3 {
 	uint32_t  u32NumSurfaces;   ///< Number of members in a Texture Array.
 	uint32_t  u32NumFaces;    ///< Number of faces in a Cube Map. Maybe be a value other than 6.
 	uint32_t  u32MIPMapCount;   ///< Number of MIP Maps in the texture - NB: Includes top level.
-	uint32_t  u32MetaDataSize;  ///< Size of the accompanying meta data.  
+	uint32_t  u32MetaDataSize;  ///< Size of the accompanying meta data.
 };
 
 typedef unsigned int    PVRTuint32;
 // V3 Header Identifiers.
 static const PVRTuint32 PVRTEX3_IDENT      = 0x03525650; // 'P''V''R'3
 
-uint8_t* 
+uint8_t*
 gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
@@ -718,7 +718,7 @@ gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	if (type != PVRTEX3_IDENT) {
 		fs_seek_from_head(file, sizeof(uint32_t));
 	} else {
-		fs_seek_from_head(file, sizeof(uint32_t)+sizeof(uint32_t)+sizeof(uint64_t)+sizeof(uint32_t)+sizeof(uint32_t));			
+		fs_seek_from_head(file, sizeof(uint32_t)+sizeof(uint32_t)+sizeof(uint64_t)+sizeof(uint32_t)+sizeof(uint32_t));
 	}
 	fs_read(file, height, sizeof(uint32_t));
 	fs_read(file, width, sizeof(uint32_t));
@@ -734,12 +734,12 @@ gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
 	}
-	fs_close(file);	
+	fs_close(file);
 
 	return buf;
 }
 
-void 
+void
 gimg_pvr_write_file(const char* filepath, const uint8_t* buf, int width, int height) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {
@@ -767,12 +767,12 @@ gimg_pvr_write_file(const char* filepath, const uint8_t* buf, int width, int hei
 	fs_close(file);
 }
 
-unsigned 
+unsigned
 gimg_pvr_get_morton_number(int x, int y) {
 	return GetMortonNumber(x, y);
 }
 
-uint8_t* 
+uint8_t*
 gimg_pvr_init_blank(int edge) {
 	assert(IS_POT(edge));
 

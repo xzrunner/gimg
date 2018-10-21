@@ -19,20 +19,20 @@ struct stream {
 };
 
 static inline void
-_read_memory_cb(png_structp png, png_bytep data, png_size_t size) 
+_read_memory_cb(png_structp png, png_bytep data, png_size_t size)
 {
 	struct stream* ss = (struct stream*)png_get_io_ptr(png);
 	memcpy(data, ss->data + ss->offset, size);
 	ss->offset += size;
 }
 
-uint8_t* 
+uint8_t*
 gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open png file: %s\n", filepath);
 	}
-	
+
 	size_t sz = fs_size(file);
 	uint8_t* buf = (uint8_t*)malloc(sz);
 	if (buf == NULL) {
@@ -77,23 +77,23 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		// Creates a full alpha channel if transparency is encoded as
 		// an array of palette entries or a single transparent color.
 		lTransparency = false;
-		if (png_get_valid(lPngPtr, lInfoPtr, PNG_INFO_tRNS)) 
+		if (png_get_valid(lPngPtr, lInfoPtr, PNG_INFO_tRNS))
 		{
 			png_set_tRNS_to_alpha(lPngPtr);
 			lTransparency = true;
 		}
 		// Expands PNG with less than 8bits per channel to 8bits.
-		if (lDepth < 8) 
+		if (lDepth < 8)
 		{
 			png_set_packing (lPngPtr);
-		} 
+		}
 		// Shrinks PNG with 16bits per color channel down to 8bits.
-		else if (lDepth == 16) 
+		else if (lDepth == 16)
 		{
 			png_set_strip_16(lPngPtr);
 		}
 		// Indicates that image needs conversion to RGBA if needed.
-		switch (lColorType) 
+		switch (lColorType)
 		{
 		case PNG_COLOR_TYPE_PALETTE:
 			png_set_palette_to_rgb(lPngPtr);
@@ -122,7 +122,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		if (!lImageBuffer) break;
 		lRowPtrs = (png_bytep*)malloc(lHeight * sizeof(png_bytep));
 		if (!lRowPtrs) break;
-		for (unsigned int i = 0; i < lHeight; ++i) 
+		for (unsigned int i = 0; i < lHeight; ++i)
 		{
 			lRowPtrs[lHeight - (i + 1)] = lImageBuffer + i * lRowSize;
 		}
@@ -141,7 +141,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	//		Log::error("Error while reading PNG file");
 	free(lRowPtrs); free(lImageBuffer);
 	free(buf);
-	if (lPngPtr != NULL) 
+	if (lPngPtr != NULL)
 	{
 		png_infop* lInfoPtrP = lInfoPtr != NULL ? &lInfoPtr : NULL;
 		png_destroy_read_struct(&lPngPtr, lInfoPtrP, NULL);
@@ -151,7 +151,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	free(buf);
 }
 
-int 
+int
 gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
 	if (format != GPF_RGB && format != GPF_RGBA8) {
 		return -1;
@@ -202,7 +202,7 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	return 0;
 }
 
-static void 
+static void
 _read_file_cb(png_structp png_ptr, png_bytep out, png_size_t count)
 {
 	png_voidp io_ptr = png_get_io_ptr(png_ptr);
@@ -214,7 +214,7 @@ _read_file_cb(png_structp png_ptr, png_bytep out, png_size_t count)
 	fs_read(file, (char*)out, count);
 }
 
-void 
+void
 gimg_png_read_header(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
@@ -254,7 +254,7 @@ gimg_png_read_header(const char* filepath, int* width, int* height) {
 
 	*width = _width; *height = _height;
 
-	if (png_ptr != NULL) 
+	if (png_ptr != NULL)
 	{
 		png_infop* info_ptr_ptr = info_ptr != NULL ? &info_ptr : NULL;
 		png_destroy_read_struct(&png_ptr, info_ptr_ptr, NULL);

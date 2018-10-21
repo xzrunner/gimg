@@ -42,7 +42,7 @@ read_int(struct fs_file* file, char last, int* ret) {
 	return last;
 }
 
-uint8_t* 
+uint8_t*
 gimg_ppm_read(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
@@ -86,7 +86,7 @@ gimg_ppm_read(const char* filepath, int* width, int* height) {
 	return pixels;
 }
 
-int 
+int
 gimg_ppm_write(const char* filepath, const uint8_t* pixels, int width, int height) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {
@@ -94,6 +94,6 @@ gimg_ppm_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	}
 
 	// todo
-	
+
 	return 0;
 }

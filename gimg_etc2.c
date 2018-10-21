@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-static inline void 
+static inline void
 read_color_block_etc(uint8_t** stream, unsigned int* block1, unsigned int* block2) {
 	uint8_t *data = *stream;
 	*block1 = 0;			*block1 |= data[0];
@@ -109,7 +109,7 @@ gimg_etc2_decode_rgba4(const uint8_t* buf, int width, int height, int type) {
 	return (uint8_t*)dst;
 }
 
-uint8_t* 
+uint8_t*
 gimg_etc2_decode_rgba8(const uint8_t* buf, int width, int height, int type) {
 	if (!INITED) {
 		etcpack_init();
@@ -179,7 +179,7 @@ gimg_etc2_decode_rgba8(const uint8_t* buf, int width, int height, int type) {
 	return dst;
 }
 
-uint8_t* 
+uint8_t*
 gimg_etc2_encode(const uint8_t* buf, int width, int height) {
 	return NULL;
 }
@@ -199,13 +199,13 @@ struct PKMHeader {
 	unsigned char heightLSB;
 };
 
-uint8_t* 
+uint8_t*
 gimg_etc2_read_file(const char* filepath, int* width, int* height, int* type) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
 		fault("Can't open etc2 file: %s\n", filepath);
 	}
-	
+
 	struct PKMHeader header;
 	fs_read(file, &header, sizeof(header));
 	*type = (header.typeMSB << 8) | header.typeLSB;
@@ -226,12 +226,12 @@ gimg_etc2_read_file(const char* filepath, int* width, int* height, int* type) {
 	if (fs_read(file, buf, sz) != sz) {
 		fault("Invalid uncompress data source\n");
 	}
-	fs_close(file);	
+	fs_close(file);
 
 	return buf;
 }
 
-uint8_t* 
+uint8_t*
 gimg_etc2_init_blank(int edge) {
 	assert(IS_POT(edge));
 
@@ -243,6 +243,6 @@ gimg_etc2_init_blank(int edge) {
 	}
 
 	memset(buf, 0, sz);
-	
+
 	return buf;
 }
