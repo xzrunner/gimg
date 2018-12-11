@@ -6,7 +6,7 @@
 #include <fault.h>
 #include <logger.h>
 
-#include <libpng/png.h>
+#include <libpng16/png.h>
 
 #include <stdlib.h>
 #include <stdbool.h>
