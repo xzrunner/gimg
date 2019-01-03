@@ -704,7 +704,8 @@ uint8_t*
 gimg_pvr_read_file(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		fault("Can't open pvr file: %s\n", filepath);
+        fprintf(stderr, "can't open %s\n", filepath);
+        return NULL;
 	}
 
 	uint32_t type;

@@ -46,7 +46,8 @@ uint8_t*
 gimg_ppm_read(const char* filepath, int* width, int* height) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		fault("Can't open image file: %s\n", filepath);
+        fprintf(stderr, "can't open %s\n", filepath);
+        return NULL;
 	}
 
 	char magic[2];

@@ -361,7 +361,8 @@ uint8_t*
 gimg_dds_read_file(const char* filepath, unsigned int* out_width, unsigned int* out_height, unsigned int* out_format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		fault("Can't open dds file: %s\n", filepath);
+        fprintf(stderr, "can't open %s\n", filepath);
+        return NULL;
 	}
 
 	// read in file marker, make sure its a DDS file

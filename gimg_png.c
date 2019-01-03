@@ -30,7 +30,8 @@ uint8_t*
 gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		fault("Can't open png file: %s\n", filepath);
+        fprintf(stderr, "can't open %s\n", filepath);
+        return NULL;
 	}
 
 	size_t sz = fs_size(file);

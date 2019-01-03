@@ -234,7 +234,8 @@ uint8_t*
 gimg_tga_read_file(const char* filepath, int* width, int* height, int* format) {
 	struct fs_file* file = fs_open(filepath, "rb");
 	if (file == NULL) {
-		fault("Can't open image file: %s\n", filepath);
+        fprintf(stderr, "can't open %s\n", filepath);
+        return NULL;
 	}
 
 	TGAHeader tgaheader;
