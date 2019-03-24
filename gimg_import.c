@@ -14,6 +14,8 @@
 
 #include <logger.h>
 
+#include <stb_image.h>
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -72,6 +74,14 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	case FILE_TGA:
 		pixels = gimg_tga_read_file(filepath, width, height, format);
 		break;
+    case FILE_HDR:
+    {
+        stbi_set_flip_vertically_on_load(true);
+        int channels;
+        pixels = (uint8_t*)stbi_loadf(filepath, width, height, &channels, 0);
+        *format = GPF_RGB16F;
+    }
+        break;
 	default:
 		return pixels;
 	}

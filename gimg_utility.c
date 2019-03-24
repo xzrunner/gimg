@@ -9,38 +9,29 @@ enum GIMG_FILE
 gimg_file_type(const char* filepath) {
 	int n = strlen(filepath);
 	assert(filepath[n-4] == '.');
-	if (tolower(filepath[n-3]) == 'p' &&
-		tolower(filepath[n-2]) == 'n' &&
-		tolower(filepath[n-1]) == 'g') {
-		return FILE_PNG;
-	} else if (tolower(filepath[n-3]) == 'j' &&
-		       tolower(filepath[n-2]) == 'p' &&
-			   tolower(filepath[n-1]) == 'g') {
-		return FILE_JPG;
-	} else if (tolower(filepath[n-3]) == 'b' &&
-		       tolower(filepath[n-2]) == 'm' &&
-		       tolower(filepath[n-1]) == 'p') {
-		return FILE_BMP;
-	} else if (tolower(filepath[n-3]) == 'p' &&
-		       tolower(filepath[n-2]) == 'p' &&
-		       tolower(filepath[n-1]) == 'm') {
-		return FILE_PPM;
-	} else if (tolower(filepath[n-3]) == 'p' &&
-		       tolower(filepath[n-2]) == 'v' &&
-		       tolower(filepath[n-1]) == 'r') {
-		return FILE_PVR;
-	} else if (tolower(filepath[n-3]) == 'p' &&
-		       tolower(filepath[n-2]) == 'k' &&
-		       tolower(filepath[n-1]) == 'm') {
-		return FILE_PKM;
-	} else if (tolower(filepath[n - 3]) == 'd' &&
-		       tolower(filepath[n - 2]) == 'd' &&
-		       tolower(filepath[n - 1]) == 's') {
-		return FILE_DDS;
-	} else if (tolower(filepath[n - 3]) == 't' &&
-		       tolower(filepath[n - 2]) == 'g' &&
-		       tolower(filepath[n - 1]) == 'a') {
-		return FILE_TGA;
+    char ext[4];
+    strcpy(ext, &filepath[n - 3]);
+    for (int i = 0; i < 3; ++i) {
+        ext[i] = tolower(ext[i]);
+    }
+    if (strcmp(ext, "png") == 0) {
+        return FILE_PNG;
+    } else if (strcmp(ext, "jpg") == 0) {
+        return FILE_JPG;
+    } else if (strcmp(ext, "bmp") == 0) {
+        return FILE_BMP;
+    } else if (strcmp(ext, "ppm") == 0) {
+        return FILE_PPM;
+    } else if (strcmp(ext, "pvr") == 0) {
+        return FILE_PVR;
+    } else if (strcmp(ext, "pkm") == 0) {
+        return FILE_PKM;
+    } else if (strcmp(ext, "dds") == 0) {
+        return FILE_DDS;
+    } else if (strcmp(ext, "tga") == 0) {
+        return FILE_TGA;
+    } else if (strcmp(ext, "hdr") == 0) {
+        return FILE_HDR;
 	} else {
 		return GIMG_FILE_INVALID;
 	}
