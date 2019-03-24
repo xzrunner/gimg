@@ -198,10 +198,10 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 }
 
 uint8_t*
-gimg_rgba2rgb(const uint8_t* pixels, int width, int height) {
+gimg_rgba8_to_rgb8(const uint8_t* pixels, int width, int height) {
 	uint8_t* rgb = (uint8_t*)malloc(width*height*3);
 	if (rgb == NULL) {
-		LOGW("OOM: gimg_rgba2rgb, w %d, h %d", width, height);
+		LOGW("OOM: gimg_rgba8_to_rgb8, w %d, h %d", width, height);
 		return NULL;
 	}
 	for (int i = 0; i < height; ++i) {
