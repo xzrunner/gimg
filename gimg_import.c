@@ -79,7 +79,7 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
         stbi_set_flip_vertically_on_load(true);
         int channels;
         pixels = (uint8_t*)stbi_loadf(filepath, width, height, &channels, 0);
-        *format = GPF_RGB16F;
+        *format = GPF_RGB32F;
     }
         break;
 	default:
@@ -183,6 +183,9 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 	case GPF_RGBA4:
 		channel = 2;
 		break;
+    case GPF_RGB32F:
+        channel = 12;
+        break;
 	}
 
 	int line_sz = width * channel;
@@ -209,6 +212,28 @@ gimg_rgba8_to_rgb8(const uint8_t* pixels, int width, int height) {
 			int src = (i*width+j)*4;
 			int dst = (i*width+j)*3;
 			memcpy(&rgb[dst], &pixels[src], 3);
+		}
+	}
+	return rgb;
+}
+
+uint8_t*
+gimg_rgb32f_to_rgb8(const uint8_t* pixels, int width, int height) {
+	uint8_t* rgb = (uint8_t*)malloc(width*height*3);
+	if (rgb == NULL) {
+		LOGW("OOM: gimg_rgb16_to_rgb8, w %d, h %d", width, height);
+		return NULL;
+	}
+
+    const float* pixels32 = (const float*)pixels;
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j) {
+			int src = (i*width+j)*3;
+			int dst = (i*width+j)*3;
+            for (int k = 0; k < 3; ++k) {
+                float f = min(1.0f, pixels32[src + k]);
+                rgb[dst + k] = (uint8_t)(255 * f);
+            }
 		}
 	}
 	return rgb;
