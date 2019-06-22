@@ -183,6 +183,9 @@ gimg_revert_y(uint8_t* pixels, int width, int height, int format) {
 	case GPF_RGBA4:
 		channel = 2;
 		break;
+    case GPF_RGBA16F:
+        channel = 8;
+        break;
     case GPF_RGB16F:
         channel = 6;
         break;
