@@ -14,6 +14,7 @@
 
 #include <logger.h>
 
+#define STB_IMAGE_STATIC
 #include <stb_image.h>
 
 #include <math.h>
