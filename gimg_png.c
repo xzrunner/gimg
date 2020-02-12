@@ -154,19 +154,28 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 
 int
 gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
-	if (format != GPF_RGB && format != GPF_RGBA8) {
-		return -1;
-	}
-
 	unsigned bands_per_pixel;
 	png_byte color_type;
-	if (format == GPF_RGB) {
-		bands_per_pixel = 3;
-		color_type = PNG_COLOR_TYPE_RGB;
-	} else {
-		bands_per_pixel = 4;
-		color_type = PNG_COLOR_TYPE_RGBA;
-	}
+
+    switch (format)
+    {
+    case GPF_ALPHA:
+    case GPF_LUMINANCE:
+    case GPF_LUMINANCE_ALPHA:
+        bands_per_pixel = 1;
+        color_type = PNG_COLOR_TYPE_GRAY;
+        break;
+    case GPF_RGB:
+        bands_per_pixel = 3;
+        color_type = PNG_COLOR_TYPE_RGB;
+        break;
+    case GPF_RGBA8:
+        bands_per_pixel = 4;
+        color_type = PNG_COLOR_TYPE_RGBA;
+        break;
+    default:
+        return -1;
+    }
 
 	int bit_depth = 8;
 
@@ -180,8 +189,7 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	assert(info_ptr);
 	png_init_io(png_ptr, out);
-	png_set_IHDR(png_ptr, info_ptr, width, height,
-		bit_depth, color_type, PNG_INTERLACE_NONE,
+	png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, color_type, PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 	png_write_info(png_ptr, info_ptr);
 
@@ -196,8 +204,10 @@ gimg_png_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 		}
 	}
 
-	png_write_image(png_ptr, &row_pointers[0]);
-	png_write_end(png_ptr, NULL);
+	png_write_image(png_ptr, row_pointers);
+	png_write_end(png_ptr, info_ptr);
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+
 	fclose(out);
 
 	return 0;

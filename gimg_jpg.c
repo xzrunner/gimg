@@ -1,4 +1,5 @@
 #include "gimg_jpg.h"
+#include "gimg_typedef.h"
 
 #include <libjpeg/jpeglib.h>
 
@@ -171,7 +172,26 @@ gimg_jpg_read(const char* filepath, int* width, int* height, int* channels) {
 }
 
 int
-gimg_jpg_write(const char* filepath, const uint8_t* pixels, int width, int height, int quality) {
+gimg_jpg_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int quality) {
+    int bands_per_pixel;
+    int colorspace = JCS_UNKNOWN;
+
+    switch (format)
+    {
+    case GPF_ALPHA:
+    case GPF_LUMINANCE:
+    case GPF_LUMINANCE_ALPHA:
+        bands_per_pixel = 1;
+        colorspace = JCS_GRAYSCALE;
+        break;
+    case GPF_RGB:
+        bands_per_pixel = 3;
+        colorspace = JCS_RGB;
+        break;
+    default:
+        return -1;
+    }
+
 	/* This struct contains the JPEG compression parameters and pointers to
 	* working space (which is allocated as needed by the JPEG library).
 	* It is possible to have several such structures, representing multiple
@@ -225,8 +245,8 @@ gimg_jpg_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	*/
 	cinfo.image_width = width; 	/* image width and height, in pixels */
 	cinfo.image_height = height;
-	cinfo.input_components = 3;		/* # of color components per pixel */
-	cinfo.in_color_space = JCS_RGB; 	/* colorspace of input image */
+	cinfo.input_components = bands_per_pixel;		/* # of color components per pixel */
+	cinfo.in_color_space = colorspace; 	/* colorspace of input image */
 	/* Now use the library's routine to set default compression parameters.
 	* (You must set at least cinfo.in_color_space before calling this,
 	* since the defaults depend on the source color space.)
@@ -252,7 +272,7 @@ gimg_jpg_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 	* To keep things simple, we pass one scanline per call; you can pass
 	* more if you wish, though.
 	*/
-	row_stride = width * 3;	/* JSAMPLEs per row in data */
+	row_stride = width * bands_per_pixel;	/* JSAMPLEs per row in data */
 
 	//while (cinfo.next_scanline < cinfo.image_height) {
 	//	/* jpeg_write_scanlines expects an array of pointers to scanlines.

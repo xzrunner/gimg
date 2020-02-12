@@ -16,7 +16,7 @@ gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, int forma
 		ret = gimg_png_write(filepath, pixels, w, h, format, reverse);
 		break;
 	case FILE_JPG:
-		ret = gimg_jpg_write(filepath, pixels, w, h, 80);
+		ret = gimg_jpg_write(filepath, pixels, w, h, format, 80);
 		break;
 	case FILE_BMP:
 		if (format == GPF_RGB) {
