@@ -8,7 +8,9 @@
 enum GIMG_FILE
 gimg_file_type(const char* filepath) {
 	int n = strlen(filepath);
-	assert(filepath[n-4] == '.');
+    if (filepath[n - 4] != '.') {
+        return GIMG_FILE_INVALID;
+    }
     char ext[4];
     strcpy(ext, &filepath[n - 3]);
     for (int i = 0; i < 3; ++i) {
