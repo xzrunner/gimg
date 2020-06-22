@@ -36,7 +36,17 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		{
 			int channels;
 			pixels = gimg_jpg_read(filepath, width, height, &channels);
-			*format = GPF_RGB;
+			switch (channels)
+			{
+			case 1:
+				*format = GPF_RED;
+				break;
+			case 3:
+				*format = GPF_RGB;
+				break;
+			default:
+				assert(0);
+			}
 		}
 		break;
 	case FILE_BMP:
