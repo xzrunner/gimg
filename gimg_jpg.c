@@ -1,7 +1,8 @@
 #include "gimg_jpg.h"
 #include "gimg_typedef.h"
 
-#include <libjpeg/jpeglib.h>
+#include <stdio.h>
+#include <jpeglib.h>
 
 #include <logger.h>
 

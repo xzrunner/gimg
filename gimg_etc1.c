@@ -1,10 +1,10 @@
 #include "gimg_etc1.h"
 #include "gimg_math.h"
+#include "gimg_rg_etc1.h"
 
 #include <fault.h>
 #include <logger.h>
 #include <fs_file.h>
-#include <rg_etc1_for_c.h>
 
 #include <assert.h>
 #include <stdlib.h>

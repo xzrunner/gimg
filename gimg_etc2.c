@@ -1,7 +1,6 @@
 #include "gimg_etc2.h"
 #include "gimg_math.h"
-
-#include <c_wrap_etcpack.h>
+#include "gimg_etcpack.h"
 
 #include <logger.h>
 #include <fault.h>
