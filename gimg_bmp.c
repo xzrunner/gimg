@@ -40,7 +40,7 @@ typedef struct tagBITMAPINFOHEADER{
 	LONG       biHeight;
 	WORD       biPlanes;
 	WORD       biBitCount;
-	DWORD      biCompression;
+	DWORD      biCompression;	/* 0 - rgb, 1 - rle8, 2 - rle4, 3 - BITFEILDS */
 	DWORD      biSizeImage;
 	LONG       biXPelsPerMeter;
 	LONG       biYPelsPerMeter;
@@ -137,6 +137,11 @@ gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 	} else if (bmih.biBitCount == 24) {
 		pixels = read_pixels(file, w, h, 3);
 		*format = GPF_RGB;
+	} else if (bmih.biBitCount == 16) {
+		pixels = (uint8_t*)malloc(w * h * 2);
+		fs_seek_from_cur(file, 12);	// skip rgbquad mask
+		fs_read(file, (void*)pixels, w * h * 2);
+		*format = GPF_RGB565;
 	} else {
 		fault("Invalid image file: %s\n", filepath);
 	}
@@ -147,28 +152,45 @@ gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 }
 
 int
-gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int height) {
+gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int height, int format) {
 	struct fs_file* file = fs_open(filepath, "wb");
 	if (file == NULL) {
 		fault("Can't open image file: %s\n", filepath);
 	}
+
+	uint8_t rgb_mask[12] = {// RGBQUAD MASK     
+		0x00, 0xF8, 0x00, 0x00, //red mask     
+ 		0xE0, 0x07, 0x00, 0x00, //green mask    
+		0x1F, 0x00, 0x00, 0x00  //blue mask
+	};
 
 	BITMAPFILEHEADER bmfh;
 	memset(&bmfh, 0, sizeof(bmfh));
 	bmfh.bfType = 0x4d42;       // 0x4d42 = 'BM'
 	bmfh.bfReserved1 = 0;
 	bmfh.bfReserved2 = 0;
-	bmfh.bfOffBits = 14 + 40;
-	bmfh.bfSize = bmfh.bfOffBits + width * height * 3;
-	bmfh.bfSize = (bmfh.bfSize + 3) & ~3;
+	if (format == GPF_RGB565) {
+		bmfh.bfOffBits = 14 + 40 + sizeof(rgb_mask);
+		bmfh.bfSize = bmfh.bfOffBits + width * height * 2;
+		bmfh.bfSize = (bmfh.bfSize + 2) & ~2;
+	} else {
+		bmfh.bfOffBits = 14 + 40;
+		bmfh.bfSize = bmfh.bfOffBits + width * height * 3;
+		bmfh.bfSize = (bmfh.bfSize + 3) & ~3;
+	}
 
 	BITMAPINFOHEADER bmih;
 	bmih.biSize = sizeof(bmih);
 	bmih.biWidth = width;
 	bmih.biHeight = height;
 	bmih.biPlanes = 1;
-	bmih.biBitCount = 24;
-	bmih.biCompression = 0;      // BI_RGB;
+	if (format == GPF_RGB565) {
+		bmih.biBitCount = 16;
+		bmih.biCompression = 3;
+	} else {
+		bmih.biBitCount = 24;
+		bmih.biCompression = 0;
+	}
 	bmih.biSizeImage = 0;
 	bmih.biXPelsPerMeter = 0x0ec4;
 	bmih.biYPelsPerMeter = 0x0ec4;
@@ -177,25 +199,29 @@ gimg_bmp_write(const char* filepath, const uint8_t* pixels, int width, int heigh
 
 	fs_write(file, &bmfh, sizeof(bmfh));
 	fs_write(file, &bmih, sizeof(bmih));
-
-//	fs_write(file, (void*)pixels, width * height * 3);
-
-	ARRAY(uint8_t, buf, width * 3);
-	int src_ptr = 0;
-	for (int y = 0; y < height; ++y) {
-		int dst_ptr = 0;
-		for (int x = 0; x < width; ++x) {
-			const uint8_t* src = &pixels[src_ptr];
-			uint8_t* dst = &buf[dst_ptr];
-			dst[0] = src[2];
-			dst[1] = src[1];
-			dst[2] = src[0];
-			src_ptr += 3;
-			dst_ptr += 3;
-		}
-		fs_write(file, (void*)buf, width * 3);
+	if (format == GPF_RGB565) 
+	{
+		fs_write(file, rgb_mask, sizeof(rgb_mask));
+		fs_write(file, (void*)pixels, width * height * 2);
 	}
-
+	else 
+	{
+		ARRAY(uint8_t, buf, width * 3);
+		int src_ptr = 0;
+		for (int y = 0; y < height; ++y) {
+			int dst_ptr = 0;
+			for (int x = 0; x < width; ++x) {
+				const uint8_t* src = &pixels[src_ptr];
+				uint8_t* dst = &buf[dst_ptr];
+				dst[0] = src[2];
+				dst[1] = src[1];
+				dst[2] = src[0];
+				src_ptr += 3;
+				dst_ptr += 3;
+			}
+			fs_write(file, (void*)buf, width * 3);
+		}
+	}
 	fs_close(file);
 
 	return 0;
