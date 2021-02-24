@@ -44,8 +44,6 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 			case 3:
 				*format = GPF_RGB;
 				break;
-			default:
-				assert(0);
 			}
 		}
 		break;
