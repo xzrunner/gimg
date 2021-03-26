@@ -70,6 +70,7 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 
 		png_set_sig_bytes(lPngPtr, 8);
 		png_read_info(lPngPtr, lInfoPtr);
+		png_set_swap(lPngPtr);
 		png_int_32 lDepth, lColorType;
 		png_uint_32 lWidth, lHeight;
 		png_get_IHDR(lPngPtr, lInfoPtr, &lWidth, &lHeight, &lDepth, &lColorType, NULL, NULL, NULL);
@@ -88,11 +89,11 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		{
 			png_set_packing (lPngPtr);
 		}
-		// Shrinks PNG with 16bits per color channel down to 8bits.
-		else if (lDepth == 16)
-		{
-			png_set_strip_16(lPngPtr);
-		}
+		//// Shrinks PNG with 16bits per color channel down to 8bits.
+		//else if (lDepth == 16)
+		//{
+		//	png_set_strip_16(lPngPtr);
+		//}
 		// Indicates that image needs conversion to RGBA if needed.
 		switch (lColorType)
 		{
@@ -109,6 +110,9 @@ gimg_png_read(const char* filepath, int* width, int* height, int* format) {
 		case PNG_COLOR_TYPE_GRAY:
 			png_set_expand_gray_1_2_4_to_8(lPngPtr);
 			*format = lTransparency ? GPF_LUMINANCE_ALPHA : GPF_LUMINANCE;
+			if (lDepth == 16) {
+				*format = GPF_R16;
+			}
 			break;
 		case PNG_COLOR_TYPE_GA:
 			png_set_expand_gray_1_2_4_to_8(lPngPtr);
