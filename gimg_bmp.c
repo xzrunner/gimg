@@ -50,17 +50,15 @@ typedef struct tagBITMAPINFOHEADER{
 
 static uint8_t*
 read_pixels(struct fs_file* file, int w, int h, int c) {
-	assert(c == 4 || c == 3);
-
 	int line_sz;
 	if (c == 3) {
 		int padding = 0;
-		while ((w * 3 + padding) % 4 != 0) {
+		while ((w * c + padding) % 4 != 0) {
 			padding++;
 		}
-		line_sz = w * 3 + padding;
+		line_sz = w * c + padding;
 	} else {
-		line_sz = w * 4;
+		line_sz = w * c;
 	}
 
 	uint8_t* pixels = (uint8_t*)malloc(line_sz * h);
@@ -69,38 +67,33 @@ read_pixels(struct fs_file* file, int w, int h, int c) {
 		return NULL;
 	}
 
-	if (c == 3) {
-		int dst_ptr = 0;
-		ARRAY(uint8_t, data, line_sz);
-		for (int y = 0; y < h; ++y) {
-			int src_ptr= 0;
-			fs_read(file, data, line_sz);
-			for (int x = 0; x < w; ++x) {
-				const uint8_t* src = &data[src_ptr];
-				uint8_t* dst = &pixels[dst_ptr];
+	int dst_ptr = 0;
+	ARRAY(uint8_t, data, line_sz);
+	for (int y = 0; y < h; ++y) {
+		int src_ptr = 0;
+		fs_read(file, data, line_sz);
+		for (int x = 0; x < w; ++x) {
+			const uint8_t* src = &data[src_ptr];
+			uint8_t* dst = &pixels[dst_ptr];
+			switch (c)
+			{
+			case 1:
+				dst[0] = src[0];
+				break;
+			case 3:
 				dst[0] = src[2];
 				dst[1] = src[1];
 				dst[2] = src[0];
-				src_ptr += c;
-				dst_ptr += c;
-			}
-		}
-	} else {
-		int dst_ptr = 0;
-		ARRAY(uint8_t, data, line_sz);
-		for (int y = 0; y < h; ++y) {
-			int src_ptr= 0;
-			fs_read(file, data, line_sz);
-			for (int x = 0; x < w; ++x) {
-				const uint8_t* src = &data[src_ptr];
-				uint8_t* dst = &pixels[dst_ptr];
+				break;
+			case 4:
 				dst[0] = src[2];
 				dst[1] = src[1];
 				dst[2] = src[0];
 				dst[3] = src[3];
-				src_ptr += c;
-				dst_ptr += c;
+				break;
 			}
+			src_ptr += c;
+			dst_ptr += c;
 		}
 	}
 
@@ -142,6 +135,9 @@ gimg_bmp_read(const char* filepath, int* width, int* height, int* format) {
 		fs_seek_from_cur(file, 12);	// skip rgbquad mask
 		fs_read(file, (void*)pixels, w * h * 2);
 		*format = GPF_RGB565;
+	} else if (bmih.biBitCount == 8) {
+		pixels = read_pixels(file, w, h, 4);
+		*format = GPF_RGBA8;
 	} else {
 		fault("Invalid image file: %s\n", filepath);
 	}
