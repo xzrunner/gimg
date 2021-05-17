@@ -92,6 +92,7 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
         pixels = (uint8_t*)stbi_loadf(filepath, width, height, &channels, 0);
 		assert(channels == 3);
         *format = GPF_RGB32F;
+		stbi_set_flip_vertically_on_load(false);
     }
         break;
 	default:
