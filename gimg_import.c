@@ -11,6 +11,7 @@
 #include "gimg_etc2.h"
 #include "gimg_dds.h"
 #include "gimg_tga.h"
+#include "gimg_hgt.h"
 
 #include <logger.h>
 
@@ -95,6 +96,10 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		stbi_set_flip_vertically_on_load(false);
     }
         break;
+	case FILE_HGT:
+		pixels = (uint8_t*)gimg_hgt_read_file(filepath, width, height);
+		*format = GPF_R16;
+		break;
 	default:
 		return pixels;
 	}
