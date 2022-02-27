@@ -19,18 +19,34 @@ gimg_tif_read_file(const char* filepath, int* width, int* height, int* format) {
 	*width = w;
 	*height = h;
 
-	size_t size = w * h * 4 * 2;
-	uint32_t* pixels = (uint32_t*)malloc(size);
-	if (pixels == NULL) {
-		LOGW("OOM: gimg_tif_read_file, filepath %s, w %d, h %d", filepath, *width, *height);
+	// fixme: only support r16 now
+	if (bpp == 2)
+	{
+		size_t size = w * h * bpp;
+		uint16_t* pixels = (uint16_t*)malloc(size);
+		if (pixels == NULL) {
+			LOGW("OOM: gimg_tif_read_file, filepath %s, w %d, h %d", filepath, *width, *height);
+			return NULL;
+		}
+
+		size_t line_size = TIFFScanlineSize(tif);
+		tdata_t buf = _TIFFmalloc(line_size);
+		uint16_t* ptr = pixels;
+		for (int y = 0; y < h; y++) {
+			TIFFReadScanline(tif, buf, y, 0);
+			memcpy(ptr, buf, line_size);
+			ptr += w;
+		}
+
+		_TIFFfree(buf);
+		TIFFClose(tif);
+
+		*format = GPF_R16;
+
+		return (uint8_t*)pixels;
+	}
+	else
+	{
 		return NULL;
 	}
-
-	TIFFReadRGBAImage(tif, w, h, pixels, 0);
-
-	TIFFClose(tif);
-
-	*format = GPF_RGBA8;
-
-	return (uint8_t*)pixels;
 }
