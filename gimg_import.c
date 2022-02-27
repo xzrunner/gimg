@@ -12,7 +12,7 @@
 #include "gimg_dds.h"
 #include "gimg_tga.h"
 #include "gimg_hgt.h"
-#include "gimg_tif.h"
+#include "gimg_tiff.h"
 
 #include <logger.h>
 
@@ -101,8 +101,8 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		pixels = (uint8_t*)gimg_hgt_read_file(filepath, width, height);
 		*format = GPF_R16;
 		break;
-	case FILE_TIF:
-		pixels = gimg_tif_read_file(filepath, width, height, format);
+	case FILE_TIFF:
+		pixels = gimg_tiff_read_file(filepath, width, height, format);
 		break;
 	default:
 		return pixels;

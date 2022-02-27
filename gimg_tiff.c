@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 uint8_t* 
-gimg_tif_read_file(const char* filepath, int* width, int* height, int* format) {
+gimg_tiff_read_file(const char* filepath, int* width, int* height, int* format) {
 	TIFF* tif = TIFFOpen(filepath, "r");
 
 	int w = 0, h = 0, bpp = 0;
@@ -25,7 +25,7 @@ gimg_tif_read_file(const char* filepath, int* width, int* height, int* format) {
 		size_t size = w * h * bpp;
 		uint16_t* pixels = (uint16_t*)malloc(size);
 		if (pixels == NULL) {
-			LOGW("OOM: gimg_tif_read_file, filepath %s, w %d, h %d", filepath, *width, *height);
+			LOGW("OOM: gimg_tiff_read_file, filepath %s, w %d, h %d", filepath, *width, *height);
 			return NULL;
 		}
 
@@ -52,7 +52,7 @@ gimg_tif_read_file(const char* filepath, int* width, int* height, int* format) {
 }
 
 int 
-gimg_tif_write(const char* filepath, const uint8_t* pixels, int width, int height, int format) {
+gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int height, int format) {
 	// fixme: only support r16 now
 	if (format != GPF_R16) {
 		return 0;

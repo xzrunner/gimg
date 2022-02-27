@@ -21,8 +21,8 @@ gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, int forma
 	case FILE_BMP:
 		ret = gimg_bmp_write(filepath, pixels, w, h, format);
 		break;
-	case FILE_TIF:
-		ret = gimg_tif_write(filepath, pixels, w, h, format, reverse);
+	case FILE_TIFF:
+		ret = gimg_tiff_write(filepath, pixels, w, h, format, reverse);
 		break;
 	}
 
