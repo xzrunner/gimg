@@ -50,3 +50,44 @@ gimg_tif_read_file(const char* filepath, int* width, int* height, int* format) {
 		return NULL;
 	}
 }
+
+int 
+gimg_tif_write(const char* filepath, const uint8_t* pixels, int width, int height, int format) {
+	// fixme: only support r16 now
+	if (format != GPF_R16) {
+		return 0;
+	}
+
+	TIFF* tif = TIFFOpen(filepath, "w");
+	if (tif == NULL) {
+		return 0;
+	}
+
+	int bits_per_pixel = 16;
+	float refblackwhite[2 * 1];
+	refblackwhite[0] = 0.0;
+	refblackwhite[1] = (float)((1L << bits_per_pixel) - 1);
+
+	TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, width);
+	TIFFSetField(tif, TIFFTAG_IMAGELENGTH, height);
+	TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, bits_per_pixel);
+	TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
+	TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+	TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, 1);
+	TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, 1);
+	TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+	TIFFSetField(tif, TIFFTAG_REFERENCEBLACKWHITE, refblackwhite);
+//	TIFFSetField(tif, TIFFTAG_TRANSFERFUNCTION, gray);
+	TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_NONE);
+
+	int scan_line_sz = width * (bits_per_pixel / 8);
+	uint8_t* ptr = pixels;
+    for (int i = 0; i < height; i++) {
+		TIFFWriteScanline(tif, ptr, i, 0);
+		ptr += scan_line_sz;
+    }
+
+    TIFFClose(tif);
+
+	return 0;
+}

@@ -9,6 +9,7 @@ extern "C"
 #include <stdint.h>
 
 uint8_t* gimg_tif_read_file(const char* filepath, int* width, int* height, int* format);
+int gimg_tif_write(const char* filepath, const uint8_t* pixels, int width, int height, int format);
 
 #endif // gameimage_hgt_h
 
