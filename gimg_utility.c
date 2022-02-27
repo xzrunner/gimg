@@ -36,6 +36,8 @@ gimg_file_type(const char* filepath) {
         return FILE_HDR;
     } else if (strcmp(ext, "hgt") == 0) {
         return FILE_HGT;
+    } else if (strcmp(ext, "tif") == 0) {
+        return FILE_TIF;
 	} else {
 		return GIMG_FILE_INVALID;
 	}

@@ -18,6 +18,7 @@ enum GIMG_FILE {
 	FILE_TGA,
     FILE_HDR,
 	FILE_HGT,
+	FILE_TIF,
 };
 
 enum GIMG_IMAGE_TYPE {
