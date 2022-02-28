@@ -9,6 +9,10 @@
 uint8_t* 
 gimg_tiff_read_file(const char* filepath, int* width, int* height, int* format) {
 	TIFF* tif = TIFFOpen(filepath, "r");
+	if (tif == NULL) {
+		fprintf(stderr, "can't open %s\n", filepath);
+		return NULL;
+	}
 
 	int w = 0, h = 0, bpp = 0;
 	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
