@@ -83,7 +83,7 @@ gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int heig
 	int scan_line_sz = width * (bits_per_pixel / 8);
 	uint8_t* ptr = pixels;
     for (int i = 0; i < height; i++) {
-		TIFFWriteScanline(tif, ptr, i, 0);
+		TIFFWriteScanline(tif, ptr, height - 1 - i, 0);
 		ptr += scan_line_sz;
     }
 
