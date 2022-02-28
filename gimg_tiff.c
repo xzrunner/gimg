@@ -56,7 +56,7 @@ gimg_tiff_read_file(const char* filepath, int* width, int* height, int* format) 
 }
 
 int 
-gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int height, int format) {
+gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int height, int format, int reverse) {
 	// fixme: only support r16 now
 	if (format != GPF_R16) {
 		return 0;
@@ -86,10 +86,17 @@ gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int heig
 
 	int scan_line_sz = width * (bits_per_pixel / 8);
 	uint8_t* ptr = pixels;
-    for (int i = 0; i < height; i++) {
-		TIFFWriteScanline(tif, ptr, height - 1 - i, 0);
-		ptr += scan_line_sz;
-    }
+	if (reverse) {
+		for (int i = 0; i < height; i++) {
+			TIFFWriteScanline(tif, ptr, height - 1 - i, 0);
+			ptr += scan_line_sz;
+		}
+	} else {
+		for (int i = 0; i < height; i++) {
+			TIFFWriteScanline(tif, ptr, i, 0);
+			ptr += scan_line_sz;
+		}
+	}
 
     TIFFClose(tif);
 
