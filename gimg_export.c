@@ -5,6 +5,7 @@
 #include "gimg_png.h"
 #include "gimg_jpg.h"
 #include "gimg_bmp.h"
+#include "gimg_tiff.h"
 
 int
 gimg_export(const char* filepath, const uint8_t* pixels, int w, int h, int format, int reverse) {
