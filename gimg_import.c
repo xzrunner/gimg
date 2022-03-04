@@ -107,11 +107,11 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 	default:
 		return pixels;
 	}
-	if (pixels && *format == GPF_RGBA8)
-	{
-		gimg_remove_ghost_pixel(pixels, *width, *height);
-		gimg_format_pixels_alpha(pixels, *width, *height, 0);
-	}
+	//if (pixels && *format == GPF_RGBA8)
+	//{
+	//	gimg_remove_ghost_pixel(pixels, *width, *height);
+	//	gimg_format_pixels_alpha(pixels, *width, *height, 0);
+	//}
 	return pixels;
 }
 
