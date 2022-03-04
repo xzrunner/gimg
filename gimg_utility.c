@@ -7,13 +7,30 @@
 
 enum GIMG_FILE
 gimg_file_type(const char* filepath) {
-	int n = strlen(filepath);
-    if (filepath[n - 4] != '.') {
+    if (filepath == NULL) {
         return GIMG_FILE_INVALID;
     }
-    char ext[4];
-    strcpy(ext, &filepath[n - 3]);
-    for (int i = 0; i < 3; ++i) {
+
+	int n = strlen(filepath);
+    if (n == 0) {
+        return GIMG_FILE_INVALID;
+    }
+
+    int ptr = n - 1;
+    while (ptr >= 0) {
+        if (filepath[ptr] == '.') {
+            break;
+        }
+        --ptr;
+    }
+    if (ptr < 0) {
+        return GIMG_FILE_INVALID;
+    }
+
+    ++ptr;
+    char ext[8];
+    strcpy(ext, &filepath[ptr]);
+    for (int i = 0; i < n - ptr; ++i) {
         ext[i] = tolower(ext[i]);
     }
     if (strcmp(ext, "png") == 0) {
@@ -36,7 +53,7 @@ gimg_file_type(const char* filepath) {
         return FILE_HDR;
     } else if (strcmp(ext, "hgt") == 0) {
         return FILE_HGT;
-    } else if (strcmp(ext, "tif") == 0) {
+    } else if (strcmp(ext, "tif") == 0 || strcmp(ext, "tiff") == 0) {
         return FILE_TIFF;
 	} else {
 		return GIMG_FILE_INVALID;
