@@ -96,7 +96,7 @@ gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int heig
 		break;
 	default:
 		LOGW("Unknown image format %d", format);
-		return;
+		return 0;
 	}
 
 	float refblackwhite[2 * 1];
@@ -116,7 +116,7 @@ gimg_tiff_write(const char* filepath, const uint8_t* pixels, int width, int heig
 	TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_NONE);
 
 	int scan_line_sz = width * channels * (bits_per_pixel / 8);
-	uint8_t* ptr = pixels;
+	const uint8_t* ptr = pixels;
 	if (reverse) {
 		for (int i = 0; i < height; i++) {
 			TIFFWriteScanline(tif, ptr, height - 1 - i, 0);
