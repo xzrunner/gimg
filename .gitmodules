@@ -1,0 +1,21 @@
+[submodule "external/fs"]
+	path = external/fs
+	url = git@github.com:xzrunner/fs.git
+[submodule "external/logger"]
+	path = external/logger
+	url = git@github.com:xzrunner/logger.git
+[submodule "external/stb"]
+	path = external/stb
+	url = git@github.com:nothings/stb.git
+[submodule "external/libjpeg-turbo"]
+	path = external/libjpeg-turbo
+	url = git@github.com:libjpeg-turbo/libjpeg-turbo.git
+[submodule "external/libpng"]
+	path = external/libpng
+	url = git@github.com:pnggroup/libpng.git
+[submodule "external/zlib"]
+	path = external/zlib
+	url = git@github.com:madler/zlib.git
+[submodule "external/libtiff"]
+	path = external/libtiff
+	url = git@github.com:libsdl-org/libtiff.git
