@@ -53,11 +53,6 @@ set(ALL_FILES
     ${src}
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/external/fs)
-include_directories(${CMAKE_SOURCE_DIR}/external/stb)
-include_directories(${CMAKE_SOURCE_DIR}/external/logger)
-include_directories(${CMAKE_SOURCE_DIR}/external/libjpeg-turbo/src)
-include_directories(${CMAKE_SOURCE_DIR}/external/libpng)
-include_directories(${CMAKE_SOURCE_DIR}/external/libtiff/libtiff)
-
 add_library(gimg STATIC ${ALL_FILES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE external/fs external/stb external/logger external/libjpeg-turbo/src external/libpng external/libtiff/libtiff)
