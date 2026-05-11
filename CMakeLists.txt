@@ -55,4 +55,15 @@ set(ALL_FILES
 
 add_library(gimg STATIC ${ALL_FILES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE external/fs external/stb external/logger external/libjpeg-turbo/src external/libpng external/libtiff/libtiff)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if(TARGET fs)
+    target_link_libraries(${PROJECT_NAME} PRIVATE fs)
+else()
+    target_include_directories(${PROJECT_NAME} PRIVATE external/fs)
+endif()
+if(TARGET logger)
+    target_link_libraries(${PROJECT_NAME} PRIVATE logger)
+else()
+    target_include_directories(${PROJECT_NAME} PRIVATE external/logger)
+endif()
+target_include_directories(${PROJECT_NAME} PRIVATE external/stb external/libjpeg-turbo/src external/libpng external/libtiff/libtiff)
