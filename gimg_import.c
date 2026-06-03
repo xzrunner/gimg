@@ -16,6 +16,10 @@
 
 #include <logger.h>
 
+#ifndef min // Win32/MSVC provides min(); define it portably elsewhere
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
 #endif // STB_IMAGE_IMPLEMENTATION
