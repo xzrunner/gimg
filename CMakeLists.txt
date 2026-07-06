@@ -66,4 +66,14 @@ if(TARGET logger)
 else()
     target_include_directories(${PROJECT_NAME} PRIVATE external/logger)
 endif()
-target_include_directories(${PROJECT_NAME} PRIVATE external/stb external/libjpeg-turbo/src external/libpng external/libtiff/libtiff)
+target_include_directories(${PROJECT_NAME} PRIVATE external/stb)
+# The vendored external/{libjpeg-turbo,libpng,libtiff} copies ship only source,
+# not their generated config headers (jconfig.h/pnglibconf.h/tiffconf.h), so they
+# don't compile standalone. Prefer the fully-configured vcpkg imported targets
+# when present (they bring the correct includes); fall back to the vendored
+# source trees only where vcpkg isn't providing them (e.g. macOS/Homebrew).
+if(TARGET JPEG::JPEG AND TARGET PNG::PNG AND TARGET TIFF::TIFF)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ZLIB::ZLIB PNG::PNG JPEG::JPEG TIFF::TIFF)
+else()
+    target_include_directories(${PROJECT_NAME} PRIVATE external/libjpeg-turbo/src external/libpng external/libtiff/libtiff)
+endif()

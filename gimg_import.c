@@ -76,14 +76,12 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		}
 		break;
 	case FILE_PKM:
-		{
-			int type;
-			uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
-			uint8_t* uncompressed = gimg_etc2_decode_rgba8(compressed, *width, *height, type);
-			free(compressed);
-			pixels = uncompressed;
-			*format = GPF_RGBA8;
-		}
+		// ETC2/PKM decode is disabled in this build: gimg_etc2.c and
+		// gimg_etcpack.cpp are excluded from the CMake source list (and their
+		// etcpack_lib backend isn't vendored here), so the gimg_etc2_* symbols
+		// aren't available to link. Leave PKM unsupported -- pixels stays NULL and
+		// the caller treats it as a failed load -- rather than dragging the whole
+		// ETC decode chain back in.
 		break;
 	case FILE_DDS:
 		pixels = gimg_dds_read_file(filepath, width, height, format);
