@@ -77,12 +77,12 @@ gimg_import(const char* filepath, int* width, int* height, int* format) {
 		break;
 	case FILE_PKM:
 		{
-			int type;
-			uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
-			uint8_t* uncompressed = gimg_etc2_decode_rgba8(compressed, *width, *height, type);
-			free(compressed);
-			pixels = uncompressed;
-			*format = GPF_RGBA8;
+			//int type;
+			//uint8_t* compressed = gimg_etc2_read_file(filepath, width, height, &type);
+			//uint8_t* uncompressed = gimg_etc2_decode_rgba8(compressed, *width, *height, type);
+			//free(compressed);
+			//pixels = uncompressed;
+			//*format = GPF_RGBA8;
 		}
 		break;
 	case FILE_DDS:
